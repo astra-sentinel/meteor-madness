@@ -110,18 +110,22 @@
       <!-- Botón de regresar: solo visible si no estamos en la primera sección -->
       <button 
           class="nav-btn back-btn"
+          aria-label="Regresar"
           on:click={previousSection}
         >
-        <span class="desktop-text">← Regresar</span>
-        <span class="mobile-icon">←</span>
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
+        </svg>
       </button>
 
       <button 
         class="nav-btn continue-btn"
+        aria-label="Continuar"
         on:click={nextSection}
       >
-        <span class="desktop-text">Continuar →</span>
-        <span class="mobile-icon">→</span>
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"></path>
+        </svg>
       </button>
   
       <button 
@@ -171,39 +175,20 @@
 
   /* Navegación */
   .navigation-container {
-    padding: 3rem;
+    padding: 0 3rem;
     display: grid;
-    grid-template-columns: 10rem 1fr 20rem 1fr 10rem;
+    grid-template-columns: 20px auto 20rem auto 20px;
     grid-template-areas: "back . monitor-center . continue";
-    gap: 1rem;
     font-size: 1.5rem;
   }
 
   /* Botones pequeños de navegación */
   .nav-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    border: none;
-    border-radius: 20px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
   }
 
-  .back-btn {
-    grid-area: back;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-  }
-
-  .continue-btn {
-    grid-area: continue;
-    background: #4caf50;
-    color: white;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-  }
+  .back-btn { grid-area: back; }
+  .continue-btn { grid-area: continue; }
 
   .enter-btn {
     grid-area: monitor-center;
@@ -218,10 +203,6 @@
     box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
     font-weight: 600;
   }
-
-  /* Responsive: ocultar texto en móviles, mostrar solo iconos */
-  .mobile-icon { display: none; }
-  .desktop-text { display: inline; }
 
   /* Media queries para móviles */
   @media (max-width: 640px) {
@@ -240,20 +221,14 @@
 
     .navigation-container {
       padding: 1rem;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 20px 1fr 20px;
       grid-template-areas:
         "back . continue"
         "monitor-center monitor-center monitor-center";
     }
 
     .nav-btn {
-      padding: 0.75rem;
-      font-size: 1rem;
-      min-width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 2rem 0;
     }
 
     .enter-btn {
