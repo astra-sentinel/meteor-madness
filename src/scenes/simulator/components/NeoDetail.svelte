@@ -1,5 +1,16 @@
 <script>
   export let selectedAsteroid = null;
+  
+  // Función para obtener etiquetas legibles de calidad
+  function getQualityLabel(quality) {
+    const labels = {
+      'excellent': 'Excelente',
+      'good': 'Buena',
+      'fair': 'Regular', 
+      'poor': 'Limitada'
+    };
+    return labels[quality] || 'Desconocida';
+  }
 </script>
 
 {#if selectedAsteroid}
@@ -9,26 +20,39 @@
       <h5>{selectedAsteroid.name}</h5>
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="label">Tamaño:</span>
-          <span class="value">{Math.round(selectedAsteroid.estimated_diameter_min)} - {Math.round(selectedAsteroid.estimated_diameter_max)} m</span>
+          <span class="label">Velocidad Orbital:</span>
+          <span class="value">
+            {selectedAsteroid.orbitalVelocity ? 
+              `${selectedAsteroid.orbitalVelocity} km/s` : 
+              'Calculando...'}
+          </span>
         </div>
         <div class="detail-item">
-          <span class="label">Velocidad:</span>
-          <span class="value">{Math.round(selectedAsteroid.relative_velocity).toLocaleString()} km/h</span>
+          <span class="label">Diámetro Aproximado:</span>
+          <span class="value">
+            {selectedAsteroid.approximateDiameter ? 
+              `${selectedAsteroid.approximateDiameter} km` : 
+              'Calculando...'}
+          </span>
         </div>
         <div class="detail-item">
-          <span class="label">Distancia:</span>
-          <span class="value">{Math.round(selectedAsteroid.miss_distance_km).toLocaleString()} km</span>
+          <span class="label">Fecha de Aproximación:</span>
+          <span class="value">
+            {selectedAsteroid.approachDate || 'Por determinar'}
+          </span>
         </div>
         <div class="detail-item">
-          <span class="label">Fecha aproximación:</span>
-          <span class="value">{new Date(selectedAsteroid.close_approach_date).toLocaleDateString()}</span>
+          <span class="label">Composición:</span>
+          <span class="value">
+            {selectedAsteroid.composition || 'Analizando...'}
+          </span>
         </div>
-        {#if selectedAsteroid.is_potentially_hazardous}
-          <div class="hazard-alert">
-            ⚠️ Clasificado como Potencialmente Peligroso
-          </div>
-        {/if}
+        <div class="detail-item">
+          <span class="label">Calidad de Datos:</span>
+          <span class="value quality-{selectedAsteroid.dataQuality}">
+            {getQualityLabel(selectedAsteroid.dataQuality)}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -90,6 +114,23 @@
     font-weight: 600;
     font-size: 0.9rem;
     text-align: right;
+  }
+  
+  /* Estilos para calidad de datos */
+  .value.quality-excellent {
+    color: #4caf50;
+  }
+  
+  .value.quality-good {
+    color: #8bc34a;
+  }
+  
+  .value.quality-fair {
+    color: #ffc107;
+  }
+  
+  .value.quality-poor {
+    color: #ff9800;
   }
   
   .hazard-alert {

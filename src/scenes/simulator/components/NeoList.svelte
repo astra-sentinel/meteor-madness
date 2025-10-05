@@ -3,6 +3,11 @@
   
   export let asteroids = [];
   export let selectedAsteroid = null;
+  export let isLoading = false;
+  export let loadError = null;
+  export let asteroidsStats = null;
+  export let csvAsteroids = [];
+  export let onDebugReload = null;
   
   const dispatch = createEventDispatcher();
   
@@ -32,7 +37,18 @@
 <div class="neo-list">
   <h3>🌌 Asteroides Detectados ({asteroids.length})</h3>
   
-  {#if asteroids.length === 0}
+  <!-- Estados de carga -->
+  {#if isLoading}
+    <div class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Cargando datos de asteroides...</p>
+    </div>
+  {:else if loadError}
+    <div class="error-indicator">
+      <p>⚠️ Error: {loadError}</p>
+      <p>Reintentar carga</p>
+    </div>
+  {:else if asteroids.length === 0}
     <div class="loading">
       <div class="spinner"></div>
       <p>Escaneando el espacio...</p>
@@ -54,6 +70,26 @@
       {/each}
     </div>
   {/if}
+  
+  <!-- Información estadística y controles debug -->
+  <div class="list-footer">
+    {#if asteroidsStats}
+      <div class="data-info">
+        <small>📊 Asteroides procesados: {asteroidsStats.total}</small>
+        <small>🎯 Datos completos: {asteroidsStats.completenessPercentage}%</small>
+      </div>
+    {:else if csvAsteroids.length > 0}
+      <div class="data-info">
+        <small>📊 Datos del CSV: {csvAsteroids.length} asteroides cargados</small>
+      </div>
+    {:else if !isLoading && asteroids.length === 0 && onDebugReload}
+      <div class="debug-controls">
+        <button class="debug-btn" on:click={onDebugReload}>
+          🔍 Debug: Recargar CSV
+        </button>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -175,5 +211,79 @@
   
   .asteroid-item.selected .select-arrow {
     color: #4caf50;
+  }
+  
+  /* Estilos para indicadores de carga */
+  .loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    color: #4caf50;
+  }
+  
+  .loading-indicator .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(76, 175, 80, 0.3);
+    border-left: 4px solid #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .error-indicator {
+    background: rgba(255, 107, 107, 0.2);
+    border: 1px solid rgba(255, 107, 107, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: #ffcccb;
+    text-align: center;
+  }
+  
+  .list-footer {
+    margin-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1rem;
+  }
+  
+  .data-info {
+    padding: 0.5rem;
+    background: rgba(76, 175, 80, 0.2);
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .data-info small {
+    color: #a8e6a1;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  .debug-controls {
+    text-align: center;
+  }
+  
+  .debug-btn {
+    background: rgba(255, 193, 7, 0.8);
+    color: #333;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .debug-btn:hover {
+    background: rgba(255, 193, 7, 1);
+    transform: translateY(-1px);
   }
 </style>
