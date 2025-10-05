@@ -64,23 +64,6 @@
 <style>
   .intro {
     padding: 3rem;
-    text-align: center;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    border-radius: 15px;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-  
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    line-height: 1.6;
   }
   
   input {
