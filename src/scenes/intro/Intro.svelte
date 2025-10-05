@@ -112,6 +112,7 @@
         class="nav-btn back-btn"
         aria-label="Regresar"
         on:click={previousSection}
+        disabled={currentSection === 1 || currentSection === totalSections}
       >
         <span class="mr-2">
           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
@@ -124,6 +125,7 @@
       <button 
         class="enter-btn"
         on:click={goToSimulator}
+        hidden={currentSection !== 7}
       >
         Ingresar al Centro de Monitoreo
       </button>
@@ -132,6 +134,7 @@
         class="nav-btn continue-btn"
         aria-label="Continuar"
         on:click={nextSection}
+        disabled={currentSection === totalSections}
       >
         <span class="hidden md:inline">Continuar</span>
         <span class="ml-2">
@@ -192,6 +195,9 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+  }
+  .nav-btn:disabled {
+    opacity: 0;
   }
 
   .back-btn { grid-area: back; }
