@@ -2,6 +2,7 @@
   import { setScene, SCENES, userName } from '../../lib/stores.js';
   import NeoList from './components/NeoList.svelte';
   import NeoDetail from './components/NeoDetail.svelte';
+  import NeoSimulation from './components/NeoSimulation.svelte';
   
   // Variables locales para manejar asteroides solo en esta escena
   let asteroids = [];
@@ -66,9 +67,9 @@
   <p>Perfecto {$userName ? $userName : 'Comandante'}, ¡la simulación está en progreso!</p>
   <p>Analizando la trayectoria del meteorito y calculando posibles soluciones...</p>
   
-  <div class="simulation-display">
-    <div class="meteor">☄️</div>
-    <div class="earth">🌍</div>
+  <!-- Simulación 3D principal -->
+  <div class="simulation-3d">
+    <NeoSimulation {selectedAsteroid} />
   </div>
   
   <div class="simulator-content">
@@ -110,35 +111,10 @@
     line-height: 1.6;
   }
   
-  .simulation-display {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+  .simulation-3d {
     margin: 2rem 0;
-    padding: 2rem;
-    background: rgba(255,255,255,0.1);
     border-radius: 10px;
-    backdrop-filter: blur(10px);
-  }
-  
-  .meteor, .earth {
-    font-size: 4rem;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  .meteor {
-    animation: moveTowardsEarth 3s ease-in-out infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-  
-  @keyframes moveTowardsEarth {
-    0% { transform: translateX(-50px) rotate(0deg); }
-    50% { transform: translateX(-20px) rotate(180deg); }
-    100% { transform: translateX(-50px) rotate(360deg); }
+    overflow: hidden;
   }
   
   .action-btn {
