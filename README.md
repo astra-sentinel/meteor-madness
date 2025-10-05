@@ -1,12 +1,53 @@
-# Svelte + Vite
+# 🌌 Meteor Madness
 
-This template should help get you started developing with Svelte in Vite.
+Una aplicación web interactiva desarrollada con Svelte que simula la defensa de la Tierra contra meteoritos.
 
-## Recommended IDE Setup
+## 🚀 Estructura del proyecto
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+- **Rama `dev`**: Código fuente de Svelte (desarrollo)
+- **Rama `main`**: Build compilado para GitHub Pages (producción)
 
-## Need an official Svelte framework?
+## 🛠️ Desarrollo
+
+### Instalación
+```bash
+npm install
+```
+
+### Desarrollo local
+```bash
+npm run dev
+```
+
+### Build para producción
+```bash
+npm run build
+```
+
+## 📦 Deploy a GitHub Pages
+
+### Método automático
+```bash
+./deploy.sh
+```
+
+### Método manual
+1. Desde la rama `dev`, ejecuta: `npm run build`
+2. Copia todos los archivos de `dist/`
+3. Cambia a la rama `main`: `git checkout main`
+4. Pega los archivos en la raíz
+5. Commit y push: `git add . && git commit -m "Deploy: Update build" && git push origin main`
+
+## 🎮 Características
+
+- **SPA sin rutas**: Todo ocurre en una sola página
+- **Estado global**: Manejo de escenas con Svelte stores
+- **3 escenas interactivas**:
+  - 🌌 Introducción
+  - 🛰️ Simulador 
+  - 🎯 Estrategia
+
+## 💻 Tecnologías utilizadas
 
 Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
 
