@@ -1,29 +1,41 @@
 <script>
-  import { setScene, SCENES } from '../../lib/stores.js';
+  import { setScene, SCENES, userName, setUserName } from '../../lib/stores.js';
+  
+  let localName = '';
+  
+  // Reactivamente actualizar el store cuando cambie el nombre local
+  $: if (localName.trim()) {
+    setUserName(localName.trim());
+  }
   
   function goToSimulator() {
-    setScene(SCENES.SIMULATOR);
+    if (localName.trim()) {
+      setUserName(localName.trim());
+      setScene(SCENES.SIMULATOR);
+    } else {
+      alert('Por favor ingresa tu nombre antes de continuar');
+    }
   }
 </script>
 
 <section class="intro">
-      <div>
-    <h1>ASTRA SENTINEL </h1>
+  <div>
+    <h1>Bienvenido a Astra Sentinel</h1>
+    <p>Dejanos saber como prefieres que te llamemos:</p>
+    <input type="text" placeholder="Tu nombre" bind:value={localName}>
 
-    <input type="text" placeholder="¿Como prefieres que te llamemos?">
-    
-    <p> Bienvenido a Astra Sentinel, co, una empresa dedicada a la proteccion planetaria y al aprovechamiento de los recursos que pueden proporcionar los asteroides.</p>
-    
+    <p>Hola {localName || 'Comandante'}, una empresa dedicada a la defensa planetaria y al aprovechamiento de los recursos que pueden proporcionar los asteroides.</p>
+
     <p>En Astra Sentinel, nos encargamos de detectar, clasificar y procesar asteroides presentes en el sistema solar, hemos logrado redireccionar asterioides con el fin de elegir su trayectoria, dandonos la oportunidad de extraer sus recursos por medio de empresas mineras externas.</p>
     
     <p>Por medio espectrografia podemos detectar los contenidos minerales de varios asteroides, con el fin de clasificarlos y seleccionarlos, con nuestra constelacion de satelites en orbita, tenemos la capacidad de usar a nuestro favor procesos como ablasion por laser y el efecto Yarkovsky para controlar las trayectorias de los asteriodes con el fin de capturarlos, controlar el lugar de impacto y obtener sus minerales.</p>
     
     <p>Tú Misión es proteger la tierra de impactos catastróficos y al mismo tiempo  transformar esa amenaza en una fuente de mineralogía, lo que sería una oportunidad de conservación Ambiental.
-La minería espacial elimina la necesidad de deforestación masiva, contaminación de fuentes hídricas y erosión del suelo causadas por la minería tradicional, cada asteroide procesado equivale a preservar miles de hectáreas de bosques y ecosistemas irremplazables.
-"Astra Sentinel no es solo una empresa; es el comienzo de una nueva era donde la humanidad finalmente toma control de su destino cósmico. 
-</p>
+    La minería espacial elimina la necesidad de deforestación masiva, contaminación de fuentes hídricas y erosión del suelo causadas por la minería tradicional, cada asteroide procesado equivale a preservar miles de hectáreas de bosques y ecosistemas irremplazables.
+    "Astra Sentinel no es solo una empresa; es el comienzo de una nueva era donde la humanidad finalmente toma control de su destino cósmico. 
+    </p>
 
-</div>
+  </div>
  
   <button class="action-btn" on:click={goToSimulator}>
     🚀 Iniciar Simulación
@@ -40,7 +52,7 @@ La minería espacial elimina la necesidad de deforestación masiva, contaminaci�
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   }
   
-  h2 {
+  h1 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
@@ -50,6 +62,30 @@ La minería espacial elimina la necesidad de deforestación masiva, contaminaci�
     font-size: 1.2rem;
     margin-bottom: 1rem;
     line-height: 1.6;
+  }
+  
+  input {
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    margin: 1rem 0;
+    min-width: 250px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+  
+  input::placeholder {
+    color: rgba(255,255,255,0.7);
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #ff6b35;
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
   }
   
   .action-btn {

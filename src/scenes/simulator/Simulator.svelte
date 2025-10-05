@@ -1,5 +1,5 @@
 <script>
-  import { setScene, SCENES } from '../../lib/stores.js';
+  import { setScene, SCENES, userName } from '../../lib/stores.js';
   
   function goToMission() {
     setScene(SCENES.MISSION);
@@ -8,7 +8,7 @@
 
 <section class="simulator">
   <h2>🛰️ Simulador</h2>
-  <p>Estamos en la escena del simulador. ¡La simulación está en progreso!</p>
+  <p>Perfecto {$userName ? $userName : 'Comandante'}, ¡la simulación está en progreso!</p>
   <p>Analizando la trayectoria del meteorito y calculando posibles soluciones...</p>
   
   <div class="simulation-display">
