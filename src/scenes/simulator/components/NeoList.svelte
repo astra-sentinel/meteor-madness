@@ -5,7 +5,6 @@
   export let selectedAsteroid = null;
   export let isLoading = false;
   export let loadError = null;
-  export let asteroidsStats = null;
   export let csvAsteroids = [];
   export let onDebugReload = null;
   
@@ -13,20 +12,18 @@
   
   // Función para obtener el emoji del nivel de peligro
   function getDangerEmoji(asteroid) {
-    if (asteroid.is_potentially_hazardous) {
+    if (asteroid.simulationData?.isHazardous) {
       return '🔴';
-    } else if (asteroid.estimated_diameter_max > 500) {
+    } else if (asteroid.simulationData?.asteroidSize > 0.1) {
       return '🟡';
     }
     return '🟢';
   }
   
-  // Función para formatear distancia de forma compacta
-  function formatDistance(distance) {
-    if (distance > 1000000) {
-      return `${(distance / 1000000).toFixed(1)}M km`;
-    }
-    return `${Math.round(distance / 1000)}K km`;
+  // Función para formatear distancia orbital en AU
+  function formatOrbitalDistance(distanceAU) {
+    if (!distanceAU) return 'Desconocida';
+    return `${distanceAU.toFixed(2)} AU`;
   }
   
   function selectAsteroid(asteroid) {
@@ -63,7 +60,7 @@
           <span class="danger-indicator">{getDangerEmoji(asteroid)}</span>
           <div class="asteroid-basic-info">
             <div class="name">{asteroid.name}</div>
-            <div class="distance">{formatDistance(asteroid.miss_distance_km)}</div>
+            <div class="distance">{formatOrbitalDistance(asteroid.simulationData?.orbitalRadius)}</div>
           </div>
           <div class="select-arrow">▶</div>
         </button>
@@ -71,14 +68,9 @@
     </div>
   {/if}
   
-  <!-- Información estadística y controles debug -->
+  <!-- Información y controles debug -->
   <div class="list-footer">
-    {#if asteroidsStats}
-      <div class="data-info">
-        <small>📊 Asteroides procesados: {asteroidsStats.total}</small>
-        <small>🎯 Datos completos: {asteroidsStats.completenessPercentage}%</small>
-      </div>
-    {:else if csvAsteroids.length > 0}
+    {#if csvAsteroids.length > 0}
       <div class="data-info">
         <small>📊 Datos del CSV: {csvAsteroids.length} asteroides cargados</small>
       </div>

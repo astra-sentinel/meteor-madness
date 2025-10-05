@@ -273,19 +273,18 @@
   }
   
   function updateAsteroidData(asteroidData) {
-    console.log('Actualizando simulación para:', asteroidData.name);
     
-    // Calcular parámetros realistas basados en los datos del asteroide
-    const diameterKm = asteroidData.estimated_diameter_max / 1000; // Convertir a km
-    const sizeScale = Math.max(0.03, Math.min(0.2, diameterKm * 0.1));
+    // Usar los datos procesados de simulationData
+    const simData = asteroidData.simulationData;
+    if (!simData) {
+      console.warn('No hay datos de simulación para el asteroide:', asteroidData.name);
+      return;
+    }
     
-    // Convertir distancia de km a unidades astronómicas aproximadas para visualización
-    const distanceAU = Math.max(2, Math.min(8, asteroidData.miss_distance_km / 149597870.7));
-    
-    // Velocidad orbital basada en velocidad relativa (simplificada)
-    const velocityScale = Math.max(0.003, Math.min(0.025, 
-      50000 / asteroidData.relative_velocity
-    ));
+    // Usar los valores ya calculados del procesador
+    const sizeScale = simData.asteroidSize || 0.05;
+    const distanceAU = simData.orbitalRadius || 2.5;
+    const velocityScale = simData.orbitalSpeed || 0.01;
     
     if (asteroid) {
       // Actualizar tamaño del asteroide
@@ -297,11 +296,16 @@
       // Actualizar velocidad orbital
       orbitalParams.asteroidSpeed = velocityScale;
       
-      // Cambiar color basado en peligrosidad
-      if (asteroidData.is_potentially_hazardous) {
+      // Cambiar color basado en peligrosidad usando simulationData
+      if (simData.isHazardous) {
         asteroid.material.color.setHex(0xff4444); // Rojo para peligrosos
       } else {
-        asteroid.material.color.setHex(0x8b4513); // Marrón normal
+        // Usar el colorHue calculado por el procesador
+        const hue = simData.colorHue || 0.1;
+        const brightness = simData.brightness || 0.8;
+        const color = new THREE.Color();
+        color.setHSL(hue, 0.8, brightness * 0.5);
+        asteroid.material.color.copy(color);
       }
       
       // Recrear la órbita con nueva distancia
@@ -357,24 +361,30 @@
     </button>
   </div>
   
-  {#if selectedAsteroid}
+  {#if selectedAsteroid && selectedAsteroid.simulationData}
     <div class="simulation-data">
       <div class="data-item">
-        <span>Distancia de aproximación:</span>
-        <span>{orbitalParams.asteroidDistance.toFixed(3)} AU</span>
+        <span>Radio orbital:</span>
+        <span>{selectedAsteroid.simulationData.orbitalRadius.toFixed(3)} AU</span>
       </div>
       <div class="data-item">
-        <span>Diámetro estimado:</span>
-        <span>{selectedAsteroid.estimated_diameter_max.toFixed(1)} m</span>
+        <span>Tamaño del asteroide:</span>
+        <span>{(selectedAsteroid.simulationData.asteroidSize * 100).toFixed(1)} u.a.</span>
       </div>
       <div class="data-item">
-        <span>Velocidad relativa:</span>
-        <span>{Math.round(selectedAsteroid.relative_velocity).toLocaleString()} km/h</span>
+        <span>Período orbital:</span>
+        <span>{selectedAsteroid.simulationData.orbitalPeriod ? selectedAsteroid.simulationData.orbitalPeriod.toFixed(1) + ' años' : 'Desconocido'}</span>
       </div>
       <div class="data-item">
         <span>Estado de peligro:</span>
-        <span style="color: {selectedAsteroid.is_potentially_hazardous ? '#ff4444' : '#4caf50'}">
-          {selectedAsteroid.is_potentially_hazardous ? 'Peligroso' : 'Seguro'}
+        <span style="color: {selectedAsteroid.simulationData.isHazardous ? '#ff4444' : '#4caf50'}">
+          {selectedAsteroid.simulationData.isHazardous ? 'Peligroso' : 'Seguro'}
+        </span>
+      </div>
+      <div class="data-item">
+        <span>Calidad de datos:</span>
+        <span style="color: {selectedAsteroid.simulationData.dataReliability > 0.7 ? '#4caf50' : selectedAsteroid.simulationData.dataReliability > 0.5 ? '#ffeb3b' : '#ff4444'}">
+          {Math.round(selectedAsteroid.simulationData.dataReliability * 100)}%
         </span>
       </div>
     </div>

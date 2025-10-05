@@ -37,6 +37,22 @@ function processAsteroidData(rawData, index = 0) {
   // Extraer y limpiar el nombre
   const name = extractCleanName(rawData.full_name);
   
+  // Extraer elementos orbitales
+  const orbitalElements = {
+    a: parseFloatSafe(rawData.a),     // Semi-major axis (AU)
+    e: parseFloatSafe(rawData.e),     // Eccentricity
+    i: parseFloatSafe(rawData.i),     // Inclination (degrees)
+    om: parseFloatSafe(rawData.om),   // Longitude of ascending node (degrees)
+    w: parseFloatSafe(rawData.w),     // Argument of perihelion (degrees)
+    q: parseFloatSafe(rawData.q),     // Perihelion distance (AU)
+    ad: parseFloatSafe(rawData.ad),   // Aphelion distance (AU)
+    per_y: parseFloatSafe(rawData.per_y), // Orbital period (years)
+    H: parseFloatSafe(rawData.H)      // Absolute magnitude
+  };
+
+  // Calcular propiedades para Three.js
+  const threeJsData = calculateThreeJsProperties(orbitalElements, rawData);
+
   // Crear el objeto del asteroide con la estructura requerida
   return {
     // Identificación básica
@@ -50,16 +66,33 @@ function processAsteroidData(rawData, index = 0) {
     composition: null,          // string - Composición del asteroide
     
     // Datos orbitales originales para futuros cálculos
-    orbitalData: {
-      a: parseFloatSafe(rawData.a),     // Semi-major axis (AU)
-      e: parseFloatSafe(rawData.e),     // Eccentricity
-      i: parseFloatSafe(rawData.i),     // Inclination (degrees)
-      om: parseFloatSafe(rawData.om),   // Longitude of ascending node (degrees)
-      w: parseFloatSafe(rawData.w),     // Argument of perihelion (degrees)
-      q: parseFloatSafe(rawData.q),     // Perihelion distance (AU)
-      ad: parseFloatSafe(rawData.ad),   // Aphelion distance (AU)
-      per_y: parseFloatSafe(rawData.per_y), // Orbital period (years)
-      H: parseFloatSafe(rawData.H)      // Absolute magnitude
+    orbitalData: orbitalElements,
+    
+    // Datos específicos para simulación Three.js
+    simulationData: {
+      // Parámetros visuales calculados
+      orbitalRadius: threeJsData.orbitalRadius,       // Distancia orbital para visualización (AU)
+      orbitalSpeed: threeJsData.orbitalSpeed,         // Velocidad angular para animación
+      asteroidSize: threeJsData.asteroidSize,         // Tamaño del asteroide para renderizado
+      orbitInclination: threeJsData.orbitInclination, // Inclinación orbital (radianes)
+      eccentricity: threeJsData.eccentricity,         // Excentricidad para órbita elíptica
+      
+      // Propiedades de apariencia
+      isHazardous: threeJsData.isHazardous,           // Si es potencialmente peligroso
+      colorHue: threeJsData.colorHue,                 // Tono de color para el asteroide
+      brightness: threeJsData.brightness,             // Brillo basado en magnitud H
+      
+      // Parámetros de órbita para cálculos precisos
+      semiMajorAxis: orbitalElements.a,               // Eje semi-mayor (AU)
+      eccentricityValue: orbitalElements.e,           // Excentricidad numérica
+      inclination: orbitalElements.i,                 // Inclinación (grados)
+      longitudeAscendingNode: orbitalElements.om,     // Longitud nodo ascendente (grados)
+      argumentPerihelion: orbitalElements.w,          // Argumento perihelio (grados)
+      orbitalPeriod: orbitalElements.per_y,           // Período orbital (años)
+      
+      // Metadatos de calidad para simulación
+      hasValidOrbit: threeJsData.hasValidOrbit,       // Si tiene datos orbitales válidos
+      dataReliability: threeJsData.dataReliability    // Nivel de confiabilidad (0-1)
     },
     
     // Metadatos
@@ -151,6 +184,220 @@ function assessDataQuality(rawData) {
 }
 
 /**
+ * Calcula propiedades específicas para la simulación Three.js
+ * @param {Object} orbitalElements - Elementos orbitales del asteroide
+ * @param {Object} rawData - Datos crudos adicionales
+ * @returns {Object} Propiedades calculadas para Three.js
+ */
+function calculateThreeJsProperties(orbitalElements, rawData) {
+  // Valores por defecto seguros
+  const defaultRadius = 2.5; // AU
+  const defaultSpeed = 0.01;
+  const defaultSize = 0.05;
+
+  // Calcular radio orbital para visualización
+  let orbitalRadius = defaultRadius;
+  if (orbitalElements.a !== null && orbitalElements.a > 0) {
+    // Usar semi-major axis, limitado para visualización
+    orbitalRadius = Math.max(1.0, Math.min(8.0, orbitalElements.a));
+  } else if (orbitalElements.q !== null && orbitalElements.q > 0) {
+    // Usar perihelion como aproximación
+    orbitalRadius = Math.max(1.0, Math.min(8.0, orbitalElements.q * 1.5));
+  }
+
+  // Calcular velocidad orbital (simplificada)
+  let orbitalSpeed = defaultSpeed;
+  if (orbitalElements.per_y !== null && orbitalElements.per_y > 0) {
+    // Velocidad inversamente proporcional al período
+    orbitalSpeed = Math.max(0.002, Math.min(0.05, 1.0 / orbitalElements.per_y));
+  }
+
+  // Calcular tamaño del asteroide basado en magnitud H
+  let asteroidSize = defaultSize;
+  if (orbitalElements.H !== null) {
+    // Fórmula aproximada: diámetro ∝ 10^(-H/5)
+    // H menor = asteroide más grande
+    const magnitude = Math.max(10, Math.min(30, orbitalElements.H));
+    asteroidSize = Math.max(0.02, Math.min(0.3, 0.5 * Math.pow(10, -(magnitude - 15) / 5)));
+  }
+
+  // Calcular inclinación orbital en radianes
+  let orbitInclination = 0;
+  if (orbitalElements.i !== null) {
+    orbitInclination = (orbitalElements.i * Math.PI) / 180; // Convertir a radianes
+  }
+
+  // Determinar si es potencialmente peligroso
+  let isHazardous = false;
+  if (orbitalElements.q !== null && orbitalElements.H !== null) {
+    // Criterio PHO: q < 1.3 AU y H < 22 (diámetro > ~140m)
+    isHazardous = orbitalElements.q < 1.3 && orbitalElements.H < 22;
+  }
+
+  // Asignar color basado en peligrosidad y tipo
+  let colorHue = 0.1; // Marrón por defecto
+  if (isHazardous) {
+    colorHue = 0.0; // Rojo para peligrosos
+  } else if (orbitalElements.H !== null && orbitalElements.H < 18) {
+    colorHue = 0.15; // Naranja para grandes
+  }
+
+  // Calcular brillo basado en magnitud H
+  let brightness = 0.8;
+  if (orbitalElements.H !== null) {
+    // H menor = más brillante
+    brightness = Math.max(0.3, Math.min(1.0, 1.0 - (orbitalElements.H - 10) / 20));
+  }
+
+  // Evaluar validez de la órbita
+  const hasValidOrbit = 
+    orbitalElements.a !== null && 
+    orbitalElements.e !== null && 
+    orbitalElements.a > 0 && 
+    orbitalElements.e >= 0 && 
+    orbitalElements.e < 1;
+
+  // Calcular confiabilidad de datos (0-1)
+  let dataReliability = 0.5;
+  const conditionCode = parseInt(rawData.condition_code) || 9;
+  const observationsUsed = parseInt(rawData.n_obs_used) || 0;
+  
+  if (conditionCode <= 2 && observationsUsed >= 100) {
+    dataReliability = 0.95;
+  } else if (conditionCode <= 4 && observationsUsed >= 50) {
+    dataReliability = 0.8;
+  } else if (conditionCode <= 6 && observationsUsed >= 10) {
+    dataReliability = 0.6;
+  } else {
+    dataReliability = 0.3;
+  }
+
+  return {
+    orbitalRadius,
+    orbitalSpeed,
+    asteroidSize,
+    orbitInclination,
+    eccentricity: orbitalElements.e || 0.1,
+    isHazardous,
+    colorHue,
+    brightness,
+    hasValidOrbit,
+    dataReliability
+  };
+}
+
+/**
+ * Filtra asteroides por calidad de datos
+ * @param {Array} asteroids - Array de asteroides procesados
+ * @param {string} minQuality - Calidad mínima requerida
+ * @returns {Array} Array filtrado de asteroides
+ */
+/**
+ * Extrae datos de simulación preparados para Three.js desde un asteroide procesado
+ * @param {Object} asteroid - Asteroide procesado
+ * @returns {Object} Datos listos para usar en Three.js
+ */
+export function getThreeJsSimulationData(asteroid) {
+  if (!asteroid || !asteroid.simulationData) {
+    throw new Error('El asteroide debe tener datos de simulación válidos');
+  }
+
+  const sim = asteroid.simulationData;
+  
+  return {
+    // Identificación
+    id: asteroid.id,
+    name: asteroid.name,
+    
+    // Parámetros de órbita para Three.js
+    orbitalRadius: sim.orbitalRadius,
+    orbitalSpeed: sim.orbitalSpeed,
+    eccentricity: sim.eccentricityValue || 0.1,
+    inclination: sim.orbitInclination,
+    
+    // Parámetros visuales
+    size: sim.asteroidSize,
+    color: {
+      hue: sim.colorHue,
+      brightness: sim.brightness,
+      isHazardous: sim.isHazardous
+    },
+    
+    // Elementos orbitales completos (para cálculos avanzados)
+    orbitalElements: {
+      semiMajorAxis: sim.semiMajorAxis,
+      eccentricity: sim.eccentricityValue,
+      inclination: sim.inclination, // en grados
+      longitudeAscendingNode: sim.longitudeAscendingNode,
+      argumentPerihelion: sim.argumentPerihelion,
+      period: sim.orbitalPeriod
+    },
+    
+    // Metadatos de calidad
+    hasValidOrbit: sim.hasValidOrbit,
+    dataReliability: sim.dataReliability,
+    
+    // Referencia al asteroide completo
+    fullData: asteroid
+  };
+}
+
+/**
+ * Filtra asteroides por calidad de datos
+ * @param {Array} asteroids - Array de asteroides procesados
+ * @param {string} minQuality - Calidad mínima requerida
+ * @returns {Array} Array filtrado de asteroides
+ */
+/**
+ * Calcula la posición del asteroide en su órbita en un momento dado
+ * @param {Object} asteroid - Asteroide procesado con datos de simulación
+ * @param {number} time - Tiempo en segundos desde época
+ * @returns {Object} Posición {x, y, z} en coordenadas AU
+ */
+export function calculateAsteroidPosition(asteroid, time = 0) {
+  if (!asteroid.simulationData || !asteroid.simulationData.hasValidOrbit) {
+    // Órbita circular por defecto
+    const radius = asteroid.simulationData?.orbitalRadius || 2.5;
+    const speed = asteroid.simulationData?.orbitalSpeed || 0.01;
+    const angle = time * speed;
+    
+    return {
+      x: Math.cos(angle) * radius,
+      y: 0,
+      z: Math.sin(angle) * radius
+    };
+  }
+
+  const sim = asteroid.simulationData;
+  const orb = asteroid.orbitalData;
+  
+  // Cálculo simplificado de posición orbital
+  const meanMotion = 2 * Math.PI / (orb.per_y * 365.25 * 24 * 3600); // radianes por segundo
+  const meanAnomaly = meanMotion * time;
+  
+  // Aproximación para anomalía excéntrica (primera iteración)
+  const eccentricAnomaly = meanAnomaly + orb.e * Math.sin(meanAnomaly);
+  
+  // Coordenadas en el plano orbital
+  const cosE = Math.cos(eccentricAnomaly);
+  const sinE = Math.sin(eccentricAnomaly);
+  const r = orb.a * (1 - orb.e * cosE);
+  
+  const x_orb = r * cosE - orb.a * orb.e;
+  const y_orb = r * sinE * Math.sqrt(1 - orb.e * orb.e);
+  
+  // Rotaciones por elementos orbitales (simplificadas)
+  const cos_i = Math.cos(sim.orbitInclination);
+  const sin_i = Math.sin(sim.orbitInclination);
+  
+  return {
+    x: x_orb,
+    y: y_orb * cos_i,
+    z: y_orb * sin_i
+  };
+}
+
+/**
  * Filtra asteroides por calidad de datos
  * @param {Array} asteroids - Array de asteroides procesados
  * @param {string} minQuality - Calidad mínima requerida
@@ -171,35 +418,3 @@ export function filterByQuality(asteroids, minQuality = 'fair') {
   });
 }
 
-/**
- * Obtiene estadísticas de los asteroides procesados
- * @param {Array} asteroids - Array de asteroides procesados
- * @returns {Object} Objeto con estadísticas
- */
-export function getAsteroidsStats(asteroids) {
-  if (!Array.isArray(asteroids)) {
-    return { total: 0, qualityDistribution: {} };
-  }
-  
-  const qualityStats = { excellent: 0, good: 0, fair: 0, poor: 0 };
-  let totalWithOrbitalData = 0;
-  
-  asteroids.forEach(asteroid => {
-    // Contar por calidad
-    const quality = asteroid.dataQuality || 'poor';
-    qualityStats[quality] = (qualityStats[quality] || 0) + 1;
-    
-    // Contar los que tienen datos orbitales completos
-    if (asteroid.orbitalData.a !== null && asteroid.orbitalData.e !== null) {
-      totalWithOrbitalData++;
-    }
-  });
-  
-  return {
-    total: asteroids.length,
-    qualityDistribution: qualityStats,
-    withCompleteOrbitalData: totalWithOrbitalData,
-    completenessPercentage: asteroids.length > 0 ? 
-      Math.round((totalWithOrbitalData / asteroids.length) * 100) : 0
-  };
-}

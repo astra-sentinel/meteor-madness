@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { setScene, SCENES, userName } from '../../lib/stores.js';
   import { loadCSV } from '../../lib/csvService.js';
-  import { processAsteroids, getAsteroidsStats } from '../../lib/asteroidProcessor.js';
+  import { processAsteroids } from '../../lib/asteroidProcessor.js';
   import NeoList from './components/NeoList.svelte';
   import NeoDetail from './components/NeoDetail.svelte';
   import NeoSimulation from './components/NeoSimulation.svelte';
@@ -13,7 +13,6 @@
   let selectedAsteroid = null;
   let isLoading = false;
   let loadError = null;
-  let asteroidsStats = null;
   
   // Función para cargar datos CSV y procesarlos
   async function loadCSVData() {
@@ -35,11 +34,7 @@
       const processedData = processAsteroids(csvAsteroids.slice(0, 50));
       asteroids = processedData;
       
-      // Obtener estadísticas
-      asteroidsStats = getAsteroidsStats(asteroids);
-      
       console.log(`✅ Procesados ${asteroids.length} asteroides`);
-      console.log('📊 Estadísticas:', asteroidsStats);
       
     } catch (error) {
       console.error('❌ Error cargando asteroides:', error);
@@ -92,7 +87,6 @@
       {selectedAsteroid} 
       {isLoading}
       {loadError}
-      {asteroidsStats}
       {csvAsteroids}
       onDebugReload={debugLoadCSV}
       on:asteroidSelected={handleAsteroidSelection} 
@@ -153,6 +147,9 @@
     box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
     margin: 1rem auto;
     display: block;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
   }
   
   .action-btn:hover {
