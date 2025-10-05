@@ -109,23 +109,16 @@
     <div class="navigation-container">
       <!-- Botón de regresar: solo visible si no estamos en la primera sección -->
       <button 
-          class="nav-btn back-btn"
-          aria-label="Regresar"
-          on:click={previousSection}
-        >
-        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
-        </svg>
-      </button>
-
-      <button 
-        class="nav-btn continue-btn"
-        aria-label="Continuar"
-        on:click={nextSection}
+        class="nav-btn back-btn"
+        aria-label="Regresar"
+        on:click={previousSection}
       >
-        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"></path>
-        </svg>
+        <span class="mr-2">
+          <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
+          </svg>
+        </span>
+        <span class="hidden md:inline">Regresar</span>
       </button>
   
       <button 
@@ -133,6 +126,19 @@
         on:click={goToSimulator}
       >
         Ingresar al Centro de Monitoreo
+      </button>
+
+      <button 
+        class="nav-btn continue-btn"
+        aria-label="Continuar"
+        on:click={nextSection}
+      >
+        <span class="hidden md:inline">Continuar</span>
+        <span class="ml-2">
+          <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"></path>
+          </svg>
+        </span>
       </button>
     </div>
   
@@ -176,15 +182,16 @@
   /* Navegación */
   .navigation-container {
     padding: 0 3rem;
-    display: grid;
-    grid-template-columns: 20px auto 20rem auto 20px;
-    grid-template-areas: "back . monitor-center . continue";
+    display: flex;
+    justify-content: space-between;
     font-size: 1.5rem;
   }
 
   /* Botones pequeños de navegación */
   .nav-btn {
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
   }
 
   .back-btn { grid-area: back; }
@@ -218,10 +225,6 @@
 
     .navigation-container {
       padding: 1rem;
-      grid-template-columns: 20px 1fr 20px;
-      grid-template-areas:
-        "back . continue"
-        "monitor-center monitor-center monitor-center";
     }
 
     .nav-btn {
@@ -231,6 +234,8 @@
     .enter-btn {
       width: 100%;
       margin: 0;
+      padding: 0;
+      height: 3rem;
     }
   }
 </style>
