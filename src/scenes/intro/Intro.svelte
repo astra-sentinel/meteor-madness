@@ -216,9 +216,6 @@
       max-width: 100%;
     }
 
-    .desktop-text { display: none; }
-    .mobile-icon { display: inline; }
-
     .navigation-container {
       padding: 1rem;
       grid-template-columns: 20px 1fr 20px;
