@@ -1,3 +1,6 @@
+Link to live project
+https://astra-sentinel.github.io/meteor-madness/
+
 # Svelte + Vite
 
 This template should help get you started developing with Svelte in Vite.
