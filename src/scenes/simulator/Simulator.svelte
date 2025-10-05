@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { setScene, SCENES, userName } from '../../lib/stores.js';
+  import { loadCSV } from '../../lib/csvService.js';
   import NeoList from './components/NeoList.svelte';
   import NeoDetail from './components/NeoDetail.svelte';
   import NeoSimulation from './components/NeoSimulation.svelte';
@@ -52,114 +53,36 @@
     }
   ];
   
-  // Función para obtener la URL correcta del archivo
-  function getCSVUrl() {
-    // En desarrollo, Vite sirve desde la raíz
-    // En producción (GitHub Pages), necesitamos el base path
-    const isDevelopment = import.meta.env.DEV;
-    const basePath = isDevelopment ? '' : import.meta.env.BASE_URL || '/meteor-madness/';
-    return `${basePath}sbdb_query_results.csv`;
-  }
-
-  // Método alternativo de carga si el primer método falla
-  async function loadCSVAlternative() {
-    const alternativeUrls = [
-      './sbdb_query_results.csv',
-      '../../../public/sbdb_query_results.csv',
-      '/public/sbdb_query_results.csv'
-    ];
-
-    for (const url of alternativeUrls) {
-      try {
-        console.log(`Probando URL alternativa: ${url}`);
-        const response = await fetch(url);
-        if (response.ok) {
-          const csvText = await response.text();
-          await processCSVText(csvText);
-          return;
-        }
-      } catch (e) {
-        console.log(`Falló URL ${url}:`, e.message);
-      }
-    }
-    throw new Error('Todas las URLs alternativas fallaron');
-  }
-
-  // Función separada para procesar el texto CSV
-  async function processCSVText(csvText) {
-    // Parsear el CSV
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-    
-    csvAsteroids = lines.slice(1).map(line => {
-      // Parsear cada línea teniendo en cuenta las comillas
-      const values = [];
-      let currentValue = '';
-      let insideQuotes = false;
-      
-      for (let char of line) {
-        if (char === '"') {
-          insideQuotes = !insideQuotes;
-        } else if (char === ',' && !insideQuotes) {
-          values.push(currentValue.trim());
-          currentValue = '';
-        } else {
-          currentValue += char;
-        }
-      }
-      values.push(currentValue.trim()); // Agregar el último valor
-      
-      // Crear objeto con los datos del asteroide
-      const asteroid = {};
-      headers.forEach((header, index) => {
-        const value = values[index] || '';
-        asteroid[header] = value;
-      });
-      
-      return asteroid;
-    });
-    
-    console.log(`Cargados ${csvAsteroids.length} asteroides del CSV (método alternativo)`);
-    
-    // Convertir a formato de la app y usar una muestra
-    const convertedData = convertCSVToAppFormat(csvAsteroids.slice(0, 50));
-    asteroids = convertedData;
-    loadError = null; // Limpiar error si la carga alternativa fue exitosa
-  }
-
-  // Función para cargar y parsear el archivo CSV
+  // Función para cargar datos CSV usando el servicio genérico
   async function loadCSVData() {
     try {
       isLoading = true;
       loadError = null;
       
-      // Obtener la URL correcta del archivo CSV
-      const csvUrl = getCSVUrl();
-      console.log('Intentando cargar CSV desde:', csvUrl);
+      // Usar el servicio CSV genérico
+      const csvResult = await loadCSV('sbdb_query_results.csv', {
+        logProgress: true,
+        alternativeUrls: [] // El servicio ya tiene URLs por defecto
+      });
       
-      const response = await fetch(csvUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - URL: ${csvUrl}`);
-      }
+      // Guardar datos crudos del CSV
+      csvAsteroids = csvResult.data;
+      console.log('CSV Data Sample:', csvAsteroids.slice(0, 3));
       
-      const csvText = await response.text();
-      await processCSVText(csvText);
+      // Convertir a formato de la app y usar una muestra
+      const convertedData = convertCSVToAppFormat(csvAsteroids.slice(0, 50));
+      asteroids = convertedData;
+      
+      console.log(`✅ Cargados ${csvAsteroids.length} asteroides del CSV`);
       
     } catch (error) {
-      console.error('Error cargando el archivo CSV:', error);
+      console.error('❌ Error cargando el archivo CSV:', error);
       loadError = error.message;
       
-      // Intentar método alternativo usando diferentes URLs
-      try {
-        console.log('Intentando método alternativo...');
-        await loadCSVAlternative();
-      } catch (altError) {
-        console.error('Error en método alternativo:', altError);
-        // Fallback final a los datos de ejemplo
-        if (asteroids.length === 0) {
-          asteroids = sampleAsteroids;
-          loadError = `Error de carga: ${error.message}. Usando datos de ejemplo.`;
-        }
+      // Fallback a los datos de ejemplo
+      if (asteroids.length === 0) {
+        asteroids = sampleAsteroids;
+        loadError = `Error de carga: ${error.message}. Usando datos de ejemplo.`;
       }
     } finally {
       isLoading = false;
@@ -175,7 +98,6 @@
       MODE: import.meta.env.MODE
     });
     console.log('Current location:', window.location.href);
-    console.log('CSV URL will be:', getCSVUrl());
     
     await loadCSVData();
   }
