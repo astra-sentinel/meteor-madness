@@ -58,14 +58,12 @@
 
     <!-- Seccion 2: Introducción personal y misión -->
     {#if currentSection === 2}
-      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">Hola {localName || 'Comandante'}</h2>
-      <p class="mb-4 leading-relaxed">Has sido asignado al Centro de Operaciones Orbitales de AstraSentinel, la corporación líder en defensa planetaria y exploración de recursos espaciales.</p>
+      <p class="mb-4 leading-relaxed">Bienvenido <strong class="text-orange-300">{localName}</strong>! Has sido asignado al Centro de Operaciones Orbitales de AstraSentinel, la corporación líder en defensa planetaria y exploración de recursos espaciales.</p>
       <p class="mb-4 leading-relaxed">Durante décadas, la humanidad miró al cielo con asombro. Hoy, lo hacemos con determinación. Nuestra misión es clara: proteger la Tierra de amenazas cósmicas y convertir lo que alguna vez fueron riesgos en oportunidades.</p>
     {/if}
 
     <!-- Seccion 3: Contexto espacial -->
     {#if currentSection === 3}
-      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">El Nuevo Frente de Seguridad</h2>
       <p class="mb-4 leading-relaxed">El espacio ya no es un territorio lejano. Es el nuevo frente de seguridad global.</p>
       <p class="mb-4 leading-relaxed">Cada año, miles de objetos cruzan las cercanías de nuestro planeta. La mayoría son inofensivos... otros podrían borrar a la humanidad en cuestión de días.</p>
       <p class="mb-4 leading-relaxed">AstraSentinel nació para anticipar esos eventos y responder con precisión quirúrgica, combinando ciencia, estrategia y tecnología orbital de última generación.</p>
@@ -73,7 +71,6 @@
 
     <!-- Seccion 4: Rol del usuario -->
     {#if currentSection === 4}
-      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">Tu Misión</h2>
       <p class="mb-4 leading-relaxed">Has sido seleccionado para comenzar tu periodo de prueba, por tu capacidad analítica y visión estratégica.</p>
       <p class="mb-4 leading-relaxed">A partir de hoy, formarás parte de la División de Monitoreo, Mitigación y Desarrollo Económico a partir de Riesgos Espaciales.</p>
       <p class="mb-4 leading-relaxed">Tu trabajo: identificar objetos cercanos a la Tierra, evaluar su trayectoria, y determinar si representan una amenaza... o una oportunidad minera.</p>
@@ -81,7 +78,6 @@
 
     <!-- Seccion 5: Herramientas disponibles -->
     {#if currentSection === 5}
-      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">Arsenal Tecnológico</h2>
       <p class="mb-4 leading-relaxed">Para cumplir con esta tarea, contarás con acceso limitado a nuestra red de defensa orbital:</p>
       <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Constelación Sentinel:</strong> más de 160 satélites de vigilancia armados con láseres de desviación orbitando estratégicamente el planeta.</p>
       <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Estaciones Terrestres:</strong> proyectores de alta potencia capaces de modificar trayectorias desde la superficie.</p>
@@ -90,7 +86,6 @@
 
     <!-- Seccion 6: Preparación para la misión -->
     {#if currentSection === 6}
-      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">Acceso al Centro de Control</h2>
       <p class="mb-4 leading-relaxed">En breves momentos ingresarás a la sala de monitoreo orbital.</p>
       <p class="mb-4 leading-relaxed">Allí tendrás acceso al mapa dinámico del sistema solar cercano, donde cada objeto detectado es una posible amenaza... o una valiosa fuente de minerales.</p>
       <p class="mb-4 leading-relaxed">Elige sabiamente tu objetivo. Tu decisión marcará el curso de nuestra operación y el destino de nuestro planeta.</p>
