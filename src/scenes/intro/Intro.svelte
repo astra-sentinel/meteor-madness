@@ -5,16 +5,16 @@
   let currentSection = 1;
   const totalSections = 7;
   
-  // Reactivamente actualizar el store cuando cambie el nombre local
+  // Reactively update the store when the local name changes
   $: if (localName.trim()) {
     setUserName(localName.trim());
   }
   
-  // Función para avanzar a la siguiente sección
+  // Function to advance to the next section
   function nextSection() {
-    // Validar que en la primera sección se haya ingresado el nombre
+    // Validate that the name has been entered in the first section
     if (currentSection === 1 && !localName.trim()) {
-      alert('Por favor ingresa tu nombre antes de continuar');
+      alert('Please enter your name before continuing');
       return;
     }
     
@@ -23,89 +23,89 @@
     }
   }
   
-  // Función para regresar a la sección anterior
+  // Function to go back to the previous section
   function previousSection() {
     if (currentSection > 1) {
       currentSection--;
     }
   }
-  
+
   function goToSimulator() {
     if (localName.trim()) {
       setUserName(localName.trim());
       setScene(SCENES.SIMULATOR);
     } else {
-      alert('Por favor ingresa tu nombre antes de continuar');
+      alert('Please enter your name before continuing');
     }
   }
 </script>
 
 <section class="intro w-full">
   <div class="container">
-    <!-- Seccion 1: Bienvenida e ingreso de nombre -->
+    <!-- Section 1: Welcome and name input -->
     {#if currentSection === 1}
       <img src="logotype.png" alt="Astra Sentinel Logo" class="logo">
-      <p class="mb-4 text-center text-2xl">Antes de comenzar, dinos cómo quieres que te llame nuestro sistema de comando:</p>
+      <p class="mb-4 text-center text-2xl">Before we begin, tell us what you'd like our command system to call you:</p>
       <div class="flex justify-center">
         <input 
           type="text" 
-          placeholder="Tu nombre" 
+          placeholder="Your name" 
           bind:value={localName}
           class="p-3 text-center text-lg mx-auto border-2 border-white/30 rounded-xl bg-white/10 text-white my-4 min-w-[250px] backdrop-blur-md transition-all duration-300 placeholder-white/70 focus:outline-none focus:border-orange-500 focus:bg-white/15 focus:shadow-lg focus:shadow-orange-500/30"
         >
       </div>
     {/if}
 
-    <!-- Seccion 2: Introducción personal y misión -->
+    <!-- Section 2: Personal introduction and mission -->
     {#if currentSection === 2}
-      <p class="mb-4 leading-relaxed">Bienvenido <strong class="text-orange-300">{localName}</strong>! Has sido asignado al Centro de Operaciones Orbitales de AstraSentinel, la corporación líder en defensa planetaria y exploración de recursos espaciales.</p>
-      <p class="mb-4 leading-relaxed">Durante décadas, la humanidad miró al cielo con asombro. Hoy, lo hacemos con determinación. Nuestra misión es clara: proteger la Tierra de amenazas cósmicas y convertir lo que alguna vez fueron riesgos en oportunidades.</p>
+      <p class="mb-4 leading-relaxed">Welcome <strong class="text-orange-300">{localName}</strong>! You have been assigned to the AstraSentinel Orbital Operations Center, the leading corporation in planetary defense and space resource exploration.</p>
+      <p class="mb-4 leading-relaxed">For decades, humanity looked to the sky with wonder. Today, we do so with determination. Our mission is clear: protect Earth from cosmic threats and turn what were once risks into opportunities.</p>
     {/if}
 
-    <!-- Seccion 3: Contexto espacial -->
+    <!-- Section 3: Space context -->
     {#if currentSection === 3}
-      <p class="mb-4 leading-relaxed">El espacio ya no es un territorio lejano. Es el nuevo frente de seguridad global.</p>
-      <p class="mb-4 leading-relaxed">Cada año, miles de objetos cruzan las cercanías de nuestro planeta. La mayoría son inofensivos... otros podrían borrar a la humanidad en cuestión de días.</p>
-      <p class="mb-4 leading-relaxed">AstraSentinel nació para anticipar esos eventos y responder con precisión quirúrgica, combinando ciencia, estrategia y tecnología orbital de última generación.</p>
+      <p class="mb-4 leading-relaxed">Space is no longer a distant territory. It is the new global security front.</p>
+      <p class="mb-4 leading-relaxed">Every year, thousands of objects cross the vicinity of our planet. Most are harmless... others could wipe out humanity in a matter of days.</p>
+      <p class="mb-4 leading-relaxed">AstraSentinel was born to anticipate these events and respond with surgical precision, combining science, strategy, and cutting-edge orbital technology.</p>
     {/if}
 
-    <!-- Seccion 4: Rol del usuario -->
+    <!-- Section 4: User role -->
     {#if currentSection === 4}
-      <p class="mb-4 leading-relaxed">Has sido seleccionado para comenzar tu periodo de prueba, por tu capacidad analítica y visión estratégica.</p>
-      <p class="mb-4 leading-relaxed">A partir de hoy, formarás parte de la División de Monitoreo, Mitigación y Desarrollo Económico a partir de Riesgos Espaciales.</p>
-      <p class="mb-4 leading-relaxed">Tu trabajo: identificar objetos cercanos a la Tierra, evaluar su trayectoria, y determinar si representan una amenaza... o una oportunidad minera.</p>
+      <p class="mb-4 leading-relaxed">You have been selected to begin your trial period, due to your analytical capacity and strategic vision.</p>
+      <p class="mb-4 leading-relaxed">Starting today, you will be part of the Space Risk Monitoring, Mitigation and Economic Development Division.</p>
+      <p class="mb-4 leading-relaxed">Your job: identify objects near Earth, evaluate their trajectory, and determine if they represent a threat... or a mining opportunity.</p>
     {/if}
 
-    <!-- Seccion 5: Herramientas disponibles -->
+    <!-- Section 5: Available tools -->
     {#if currentSection === 5}
-      <p class="mb-4 leading-relaxed">Para cumplir con esta tarea, contarás con acceso limitado a nuestra red de defensa orbital:</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Constelación Sentinel:</strong> más de 160 satélites de vigilancia armados con láseres de desviación orbitando estratégicamente el planeta.</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Estaciones Terrestres:</strong> proyectores de alta potencia capaces de modificar trayectorias desde la superficie.</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Centro de Inteligencia Estratégica:</strong> un equipo multidisciplinario que incluye analistas, diplomáticos, ingenieros, estrategas y científicos planetarios.</p>
+      <p class="mb-4 leading-relaxed">To accomplish this task, you will have limited access to our orbital defense network:</p>
+      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Sentinel Constellation:</strong> more than 160 surveillance satellites armed with deflection lasers strategically orbiting the planet.</p>
+      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Ground Stations:</strong> high-power projectors capable of modifying trajectories from the surface.</p>
+      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Strategic Intelligence Center:</strong> a multidisciplinary team including analysts, diplomats, engineers, strategists, and planetary scientists.</p>
     {/if}
 
-    <!-- Seccion 6: Preparación para la misión -->
+    <!-- Section 6: Mission preparation -->
     {#if currentSection === 6}
-      <p class="mb-4 leading-relaxed">En breves momentos ingresarás a la sala de monitoreo orbital.</p>
-      <p class="mb-4 leading-relaxed">Allí tendrás acceso al mapa dinámico del sistema solar cercano, donde cada objeto detectado es una posible amenaza... o una valiosa fuente de minerales.</p>
-      <p class="mb-4 leading-relaxed">Elige sabiamente tu objetivo. Tu decisión marcará el curso de nuestra operación y el destino de nuestro planeta.</p>
+      <p class="mb-4 leading-relaxed">In a few moments you will enter the orbital monitoring room.</p>
+      <p class="mb-4 leading-relaxed">There you will have access to the dynamic map of the nearby solar system, where each detected object is a possible threat... or a valuable source of minerals.</p>
+      <p class="mb-4 leading-relaxed">Choose your target wisely. Your decision will mark the course of our operation and the fate of our planet.</p>
     {/if}
 
-    <!-- Seccion 7: Llamada a la acción final -->
+    <!-- Section 7: Final call to action -->
     {#if currentSection === 7}
-      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">¿Listo para Comenzar?</h2>
-      <p class="mb-4 leading-relaxed">El futuro de la Tierra está en tus manos, <strong class="text-orange-300">{localName}</strong>.</p>
-      <p class="mb-4 leading-relaxed">Cuando estés listo… entra al Centro de Monitoreo.</p>
+      <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">Ready to Begin?</h2>
+      <p class="mb-4 leading-relaxed">The future of Earth is in your hands, <strong class="text-orange-300">{localName}</strong>.</p>
+      <p class="mb-4 leading-relaxed">When you're ready… enter the Monitoring Center.</p>
     {/if}
   </div>
 
   <footer>
-    <!-- Navegación condicional -->
+    <!-- Conditional navigation -->
     <div class="navigation-container">
-      <!-- Botón de regresar: solo visible si no estamos en la primera sección -->
+      <!-- Back button: only visible if we are not in the first section -->
       <button 
         class="nav-btn back-btn"
-        aria-label="Regresar"
+        aria-label="Back"
         on:click={previousSection}
         disabled={currentSection === 1 || currentSection === totalSections}
       >
@@ -114,7 +114,7 @@
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"></path>
           </svg>
         </span>
-        <span class="hidden md:inline">Regresar</span>
+        <span class="hidden md:inline">Back</span>
       </button>
   
       <button 
@@ -122,16 +122,16 @@
         on:click={goToSimulator}
         hidden={currentSection !== 7}
       >
-        Ingresar al Centro de Monitoreo
+        Enter Monitoring Center
       </button>
 
       <button 
         class="nav-btn continue-btn"
-        aria-label="Continuar"
+        aria-label="Continue"
         on:click={nextSection}
         disabled={currentSection === totalSections}
       >
-        <span class="hidden md:inline">Continuar</span>
+        <span class="hidden md:inline">Continue</span>
         <span class="ml-2">
           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 8 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"></path>
@@ -140,9 +140,9 @@
       </button>
     </div>
   
-    <!-- Indicador de progreso -->
+    <!-- Progress indicator -->
     <div class="mt-2 md:mt-6 text-center">
-      <span class="text-md text-white/70 mb-2 block">Sección {currentSection} de {totalSections}</span>
+      <span class="text-md text-white/70 mb-2 block">Section {currentSection} of {totalSections}</span>
       <div class="w-full h-1 bg-white/20 rounded-sm overflow-hidden">
         <div 
           class="h-full bg-gradient-to-r from-green-500 to-orange-500 rounded-sm transition-all duration-500 ease-out" 
@@ -177,7 +177,7 @@
     width: 100%;
   }
 
-  /* Navegación */
+  /* Navigation */
   .navigation-container {
     padding: 0 3rem;
     display: flex;
@@ -185,7 +185,7 @@
     font-size: 1.5rem;
   }
 
-  /* Botones pequeños de navegación */
+  /* Small navigation buttons */
   .nav-btn {
     cursor: pointer;
     display: inline-flex;
@@ -212,7 +212,7 @@
     font-weight: 600;
   }
 
-  /* Media queries para móviles */
+  /* Media queries for mobile */
   @media (max-width: 640px) {
     p { font-size: 1.125rem; }
 
