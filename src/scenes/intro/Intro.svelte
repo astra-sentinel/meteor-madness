@@ -40,18 +40,20 @@
   }
 </script>
 
-<section class="p-12 flex flex-col min-h-[70vh] justify-between md:p-8 sm:p-4">
-  <div class="flex-grow flex flex-col justify-center max-w-4xl mx-auto">
+<section class="intro w-full">
+  <div class="container">
     <!-- Seccion 1: Bienvenida e ingreso de nombre -->
     {#if currentSection === 1}
-      <h1 class="text-4xl md:text-3xl font-bold mb-6 text-orange-500">Bienvenido a Astra Sentinel</h1>
-      <p class="mb-4 leading-relaxed text-lg">Antes de comenzar, dinos cómo quieres que te llame nuestro sistema de comando:</p>
-      <input 
-        type="text" 
-        placeholder="Tu nombre" 
-        bind:value={localName}
-        class="p-3 text-lg border-2 border-white/30 rounded-xl bg-white/10 text-white my-4 min-w-[250px] backdrop-blur-md transition-all duration-300 placeholder-white/70 focus:outline-none focus:border-orange-500 focus:bg-white/15 focus:shadow-lg focus:shadow-orange-500/30"
-      >
+      <img src="logotype.png" alt="Astra Sentinel Logo" class="logo">
+      <p class="mb-4 text-center text-2xl">Antes de comenzar, dinos cómo quieres que te llame nuestro sistema de comando:</p>
+      <div class="flex justify-center">
+        <input 
+          type="text" 
+          placeholder="Tu nombre" 
+          bind:value={localName}
+          class="p-3 text-center text-lg mx-auto border-2 border-white/30 rounded-xl bg-white/10 text-white my-4 min-w-[250px] backdrop-blur-md transition-all duration-300 placeholder-white/70 focus:outline-none focus:border-orange-500 focus:bg-white/15 focus:shadow-lg focus:shadow-orange-500/30"
+        >
+      </div>
     {/if}
 
     <!-- Seccion 2: Introducción personal y misión -->
@@ -81,7 +83,7 @@
     {#if currentSection === 5}
       <h2 class="text-3xl md:text-2xl font-bold mb-6 text-orange-500">Arsenal Tecnológico</h2>
       <p class="mb-4 leading-relaxed">Para cumplir con esta tarea, contarás con acceso limitado a nuestra red de defensa orbital:</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Constelación Sentinel:</strong> más de 160 satélites armados con láseres de desviación orbitando estratégicamente el planeta.</p>
+      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Constelación Sentinel:</strong> más de 160 satélites de vigilancia armados con láseres de desviación orbitando estratégicamente el planeta.</p>
       <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Estaciones Terrestres:</strong> proyectores de alta potencia capaces de modificar trayectorias desde la superficie.</p>
       <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Centro de Inteligencia Estratégica:</strong> un equipo multidisciplinario que incluye analistas, diplomáticos, ingenieros, estrategas y científicos planetarios.</p>
     {/if}
@@ -102,63 +104,161 @@
     {/if}
   </div>
 
-  <!-- Navegación condicional -->
-  <div class="flex justify-between items-center mt-8 gap-4 md:flex-col md:gap-2">
-    <!-- Botón de regresar: solo visible si no estamos en la primera sección -->
-    {#if currentSection > 1}
+  <footer>
+    <!-- Navegación condicional -->
+    <div class="navigation-container">
+      <!-- Botón de regresar: solo visible si no estamos en la primera sección -->
       <button 
-        class="px-6 py-3 text-base border-none rounded-full cursor-pointer transition-all duration-300 font-medium bg-white/10 text-white border border-white/30 backdrop-blur-md hover:bg-white/20 hover:-translate-y-0.5 md:w-full"
-        on:click={previousSection}
-      >
-        ← Regresar
-      </button>
-    {:else}
-      <!-- Spacer para mantener el layout cuando no hay botón de regresar -->
-      <div></div>
-    {/if}
-
-    <!-- Botón de continuar: visible en secciones 1-6, pero en sección 1 solo si hay nombre -->
-    {#if currentSection < totalSections}
-      {#if currentSection === 1}
-        {#if localName.trim()}
-          <button 
-            class="px-6 py-3 text-base border-none rounded-full cursor-pointer transition-all duration-300 font-medium bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-green-500/40 md:w-full"
-            on:click={nextSection}
-          >
-            Continuar →
-          </button>
-        {/if}
-      {:else}
-        <button 
-          class="px-6 py-3 text-base border-none rounded-full cursor-pointer transition-all duration-300 font-medium bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-green-500/40 md:w-full"
-          on:click={nextSection}
+          class="nav-btn back-btn"
+          on:click={previousSection}
         >
-          Continuar →
-        </button>
-      {/if}
-    {/if}
+        <span class="desktop-text">← Regresar</span>
+        <span class="mobile-icon">←</span>
+      </button>
 
-    <!-- Botón de ingresar: solo visible en la última sección -->
-    {#if currentSection === totalSections}
       <button 
-        class="bg-orange-500 text-white border-none px-8 py-4 text-lg rounded-full cursor-pointer transition-all duration-300 shadow-lg shadow-orange-500/40 font-semibold hover:bg-orange-600 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-orange-500/60 active:translate-y-0 md:w-full"
+        class="nav-btn continue-btn"
+        on:click={nextSection}
+      >
+        <span class="desktop-text">Continuar →</span>
+        <span class="mobile-icon">→</span>
+      </button>
+  
+      <button 
+        class="enter-btn"
         on:click={goToSimulator}
       >
-        🚀 Ingresar al Centro de Monitoreo
+        Ingresar al Centro de Monitoreo
       </button>
-    {/if}
-  </div>
-
-  <!-- Indicador de progreso -->
-  <div class="mt-6 text-center">
-    <span class="text-sm text-white/70 mb-2 block">Sección {currentSection} de {totalSections}</span>
-    <div class="w-full h-1 bg-white/20 rounded-sm overflow-hidden">
-      <div 
-        class="h-full bg-gradient-to-r from-green-500 to-orange-500 rounded-sm transition-all duration-500 ease-out" 
-        style="width: {(currentSection / totalSections) * 100}%"
-      ></div>
     </div>
-  </div>
+  
+    <!-- Indicador de progreso -->
+    <div class="mt-2 md:mt-6 text-center">
+      <span class="text-md text-white/70 mb-2 block">Sección {currentSection} de {totalSections}</span>
+      <div class="w-full h-1 bg-white/20 rounded-sm overflow-hidden">
+        <div 
+          class="h-full bg-gradient-to-r from-green-500 to-orange-500 rounded-sm transition-all duration-500 ease-out" 
+          style="width: {(currentSection / totalSections) * 100}%"
+        ></div>
+      </div>
+    </div>
+  </footer>
 </section>
 
+<style>
+  p { font-size: 1.5rem;}
+  .intro {
+    min-height: 100vh;
+  }
 
+  /* Logo responsivo */
+  .logo {
+    display: block;
+    margin: 0 auto 2rem auto;
+    max-height: 50vh;
+  }
+
+  .container {
+    padding: 3rem;
+    margin: 0 auto;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+  }
+
+  /* Navegación */
+  .navigation-container {
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: 10rem 1fr 20rem 1fr 10rem;
+    grid-template-areas: "back . monitor-center . continue";
+    gap: 1rem;
+    font-size: 1.5rem;
+  }
+
+  /* Botones pequeños de navegación */
+  .nav-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+
+  .back-btn {
+    grid-area: back;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .continue-btn {
+    grid-area: continue;
+    background: #4caf50;
+    color: white;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  }
+
+  .enter-btn {
+    grid-area: monitor-center;
+    background: #ff6b35;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+    font-weight: 600;
+  }
+
+  /* Responsive: ocultar texto en móviles, mostrar solo iconos */
+  .mobile-icon { display: none; }
+  .desktop-text { display: inline; }
+
+  /* Media queries para móviles */
+  @media (max-width: 640px) {
+    p { font-size: 1.125rem; }
+
+    .container {
+      padding: 1rem;
+    }
+
+    .logo {
+      max-width: 100%;
+    }
+
+    .desktop-text { display: none; }
+    .mobile-icon { display: inline; }
+
+    .navigation-container {
+      padding: 1rem;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-areas:
+        "back . continue"
+        "monitor-center monitor-center monitor-center";
+    }
+
+    .nav-btn {
+      padding: 0.75rem;
+      font-size: 1rem;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .enter-btn {
+      width: 100%;
+      margin: 0;
+    }
+  }
+</style>
