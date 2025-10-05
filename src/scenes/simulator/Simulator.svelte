@@ -2,6 +2,7 @@
   import { setScene, SCENES, userName } from '../../lib/stores.js';
   import NeoList from './components/NeoList.svelte';
   import NeoDetail from './components/NeoDetail.svelte';
+  import NeoSimulation from './components/NeoSimulation.svelte';
   
   // Variables locales para manejar asteroides solo en esta escena
   let asteroids = [];
@@ -62,22 +63,18 @@
 </script>
 
 <section class="simulator">
-  <h2>🛰️ Simulador</h2>
-  <p>Perfecto {$userName ? $userName : 'Comandante'}, ¡la simulación está en progreso!</p>
-  <p>Analizando la trayectoria del meteorito y calculando posibles soluciones...</p>
-  
-  <div class="simulation-display">
-    <div class="meteor">☄️</div>
-    <div class="earth">🌍</div>
+  <!-- Simulación 3D principal -->
+  <div class="neo-simulation">
+    <NeoSimulation {selectedAsteroid} />
   </div>
   
-  <div class="simulator-content">
-    <!-- Lista de asteroides detectados -->
-    <div class="asteroids-section">
-      <NeoList {asteroids} {selectedAsteroid} on:asteroidSelected={handleAsteroidSelection} />
-    </div>
-    
-    <!-- Panel de detalles del asteroide seleccionado -->
+  <!-- Lista de asteroides detectados -->
+  <div class="neo-list">
+    <NeoList {asteroids} {selectedAsteroid} on:asteroidSelected={handleAsteroidSelection} />
+  </div>
+  
+  <!-- Panel de detalles del asteroide seleccionado -->
+  <div class="neo-detail">
     <NeoDetail {selectedAsteroid} />
   </div>
   
@@ -88,57 +85,34 @@
 
 <style>
   .simulator {
-    padding: 2rem;
-    text-align: center;
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-    border-radius: 15px;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-width: 1200px;
-    margin: 0 auto;
+    /* Grid Layout con areas */
+    display: grid;
+    grid-template-areas:
+      "list simulation detail";
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: auto;
+    gap: 2rem;
   }
   
-  h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-  
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-  
-  .simulation-display {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin: 2rem 0;
-    padding: 2rem;
-    background: rgba(255,255,255,0.1);
+  /* Grid Areas */
+  .neo-simulation {
+    grid-area: simulation;
     border-radius: 10px;
-    backdrop-filter: blur(10px);
+    overflow: hidden;
   }
   
-  .meteor, .earth {
-    font-size: 4rem;
-    animation: pulse 2s ease-in-out infinite;
+  .neo-list {
+    grid-area: list;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 1rem;
   }
   
-  .meteor {
-    animation: moveTowardsEarth 3s ease-in-out infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-  
-  @keyframes moveTowardsEarth {
-    0% { transform: translateX(-50px) rotate(0deg); }
-    50% { transform: translateX(-20px) rotate(180deg); }
-    100% { transform: translateX(-50px) rotate(360deg); }
+  .neo-detail {
+    grid-area: detail;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 1rem;
   }
   
   .action-btn {
@@ -150,7 +124,6 @@
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 1rem;
     box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
   }
   
@@ -164,26 +137,23 @@
     transform: translateY(0);
   }
   
-  /* Nuevos estilos para la estructura de simulador */
-  .simulator-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin: 2rem 0;
-    text-align: left;
-  }
-  
-  .asteroids-section {
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    padding: 1rem;
-  }
-  
-  /* Responsive */
+  /* Responsive Design */
   @media (max-width: 768px) {
-    .simulator-content {
+    .simulator {
+      grid-template-areas:
+        "list"
+        "simulation"
+        "detail";
       grid-template-columns: 1fr;
+      grid-template-rows: 2fr auto auto auto;
       gap: 1rem;
+      padding: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .simulator {
+      min-height: auto;
     }
   }
 </style>
