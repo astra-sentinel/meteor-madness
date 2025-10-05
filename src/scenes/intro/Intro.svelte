@@ -20,25 +20,44 @@
 
 <section class="intro">
   <div>
+    <!-- Seccion 1 -->
     <h1>Bienvenido a Astra Sentinel</h1>
-    <p>Dejanos saber como prefieres que te llamemos:</p>
+    <p>Antes de comenzar, dinos cómo quieres que te llame nuestro sistema de comando:</p>
     <input type="text" placeholder="Tu nombre" bind:value={localName}>
 
-    <p>Hola {localName || 'Comandante'}, una empresa dedicada a la defensa planetaria y al aprovechamiento de los recursos que pueden proporcionar los asteroides.</p>
+    <!-- Seccion 2 -->
+    <p>Hola {localName || 'Comandante'}</p>
+    <p>Has sido asignado al Centro de Operaciones Orbitales de AstraSentinel, la corporación líder en defensa planetaria y exploración de recursos espaciales.</p>
+    <p>Durante décadas, la humanidad miró al cielo con asombro. Hoy, lo hacemos con determinación. Nuestra misión es clara: proteger la Tierra de amenazas cósmicas y convertir lo que alguna vez fueron riesgos en oportunidades.</p>
 
-    <p>En Astra Sentinel, nos encargamos de detectar, clasificar y procesar asteroides presentes en el sistema solar, hemos logrado redireccionar asterioides con el fin de elegir su trayectoria, dandonos la oportunidad de extraer sus recursos por medio de empresas mineras externas.</p>
-    
-    <p>Por medio espectrografia podemos detectar los contenidos minerales de varios asteroides, con el fin de clasificarlos y seleccionarlos, con nuestra constelacion de satelites en orbita, tenemos la capacidad de usar a nuestro favor procesos como ablasion por laser y el efecto Yarkovsky para controlar las trayectorias de los asteriodes con el fin de capturarlos, controlar el lugar de impacto y obtener sus minerales.</p>
-    
-    <p>Tú Misión es proteger la tierra de impactos catastróficos y al mismo tiempo  transformar esa amenaza en una fuente de mineralogía, lo que sería una oportunidad de conservación Ambiental.
-    La minería espacial elimina la necesidad de deforestación masiva, contaminación de fuentes hídricas y erosión del suelo causadas por la minería tradicional, cada asteroide procesado equivale a preservar miles de hectáreas de bosques y ecosistemas irremplazables.
-    "Astra Sentinel no es solo una empresa; es el comienzo de una nueva era donde la humanidad finalmente toma control de su destino cósmico. 
-    </p>
+    <!-- Seccion 3 -->
+    <p>El espacio ya no es un territorio lejano. Es el nuevo frente de seguridad global.</p>
+    <p>Cada año, miles de objetos cruzan las cercanías de nuestro planeta. La mayoría son inofensivos... otros podrían borrar a la humanidad en cuestión de días.</p>
+    <p>AstraSentinel nació para anticipar esos eventos y responder con precisión quirúrgica, combinando ciencia, estrategia y tecnología orbital de última generación.</p>
 
+    <!-- Seccion 4 -->
+    <p>Has sido seleccionado por tu capacidad analítica y visión estratégica.</p>
+    <p>A partir de hoy, formarás parte de la División de Monitoreo y Mitigación de Riesgos Espaciales.</p>
+    <p>Tu trabajo: identificar objetos cercanos a la Tierra, evaluar su trayectoria, y determinar si representan una amenaza... o una oportunidad minera.</p>
+
+    <!-- Seccion 5 -->
+    <p>Para cumplir con esta tarea, contarás con el acceso total a nuestra red de defensa orbital:</p>
+    <p>Constelación Sentinel: más de 160 satélites armados con láseres de desviación orbitando estratégicamente el planeta.</p>
+    <p>Estaciones Terrestres: proyectores de alta potencia capaces de modificar trayectorias desde la superficie.</p>
+    <p>Centro de Inteligencia Estratégica: un equipo multidisciplinario que incluye analistas, diplomáticos, ingenieros, estrategas y científicos planetarios.</p>
+
+    <!-- Seccion 6 -->
+    <p>En breves momentos ingresarás a la sala de monitoreo orbital.</p>
+    <p>Allí tendrás acceso al mapa dinámico del sistema solar cercano, donde cada objeto detectado es una posible amenaza... o una valiosa fuente de minerales.</p>
+    <p>Elige sabiamente tu objetivo. Tu decisión marcará el curso de nuestra operación y el destino de nuestro planeta.</p>
+
+    <!-- Seccion 7 -->
+    <p>El futuro de la Tierra está en tus manos, {localName}.</p>
+    <p>Cuando estés listo… entra al Centro de Monitoreo.</p>
   </div>
  
   <button class="action-btn" on:click={goToSimulator}>
-    🚀 Iniciar Simulación
+    Ingresar al centro de monitoreo
   </button>
 </section>
 

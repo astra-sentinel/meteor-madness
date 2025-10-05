@@ -9,7 +9,7 @@
 <section class="mission">
   <h2>🎯 Estrategia</h2>
   <p>Excelente trabajo {$userName ? $userName : 'Comandante'}. ¡Es hora de tomar decisiones críticas!</p>
-  <p>Basándote en la simulación, debes elegir la mejor estrategia para salvar la Tierra.</p>
+  <p>Basándote en la simulación completada, debes elegir la mejor estrategia para salvar la Tierra.</p>
   
   <div class="strategy-options">
     <div class="option">
