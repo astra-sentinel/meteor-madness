@@ -158,7 +158,7 @@
   
     <!-- Progress indicator -->
     <div class="mt-2 md:mt-6 text-center">
-      <span class="text-md text-white/70 mb-2 block">Section {currentSection} of {totalSections}</span>
+      <span class="text-md text-white/70 mb-2 block progress-text">Section {currentSection} of {totalSections}</span>
       <div class="w-full h-1 bg-white/20 rounded-sm overflow-hidden">
         <div 
           class="h-full bg-gradient-to-r from-green-500 to-orange-500 rounded-sm transition-all duration-500 ease-out" 
@@ -170,7 +170,19 @@
 </section>
 
 <style>
-  p { font-size: 1.5rem;}
+  p { 
+    font-size: 1.5rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0px 0px 4px rgba(0, 0, 0, 0.7);
+  }
+  
+  h2 {
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0px 0px 4px rgba(0, 0, 0, 0.6);
+  }
+  
+  strong {
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9), 0px 0px 6px rgba(0, 0, 0, 0.7);
+  }
+  
   .intro {
     min-height: 100vh;
   }
@@ -238,9 +250,14 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8), 0px 0px 4px rgba(0, 0, 0, 0.6);
   }
   .nav-btn:disabled {
     opacity: 0;
+  }
+  
+  .progress-text {
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8), 0px 0px 4px rgba(0, 0, 0, 0.6);
   }
 
   .back-btn { grid-area: back; }

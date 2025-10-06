@@ -98,9 +98,10 @@
     <NeoDetail {selectedAsteroid} />
   </div>
   
-  <button class="action-btn" on:click={goToMission}>
+  <!-- <button class="action-btn" on:click={goToMission}>
     🎯 Ir a Estrategia
-  </button>
+  </button> -->
+  <a class="action-btn" href="https://modelo-colision.onrender.com" target="_blank">Ir a Modelo de Colisión</a>
 </section>
 
 <style>
