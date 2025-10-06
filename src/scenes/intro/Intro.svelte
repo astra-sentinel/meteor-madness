@@ -5,6 +5,22 @@
   let currentSection = 1;
   const totalSections = 7;
   
+  // Function to get the background image for current section
+  function getBackgroundImage(section) {
+    const imageMap = {
+      2: 'section2-Image_fx.jpg',
+      3: 'section3-Image_fx.jpg', 
+      4: 'section4-image_fx.jpg',
+      5: 'section5-Image_fx.jpg',
+      6: 'section6-Image_fx.jpg'
+    };
+    
+    if (imageMap[section]) {
+      return `url('${imageMap[section]}')`;
+    }
+    return 'none';
+  }
+  
   // Reactively update the store when the local name changes
   $: if (localName.trim()) {
     setUserName(localName.trim());
@@ -41,7 +57,7 @@
 </script>
 
 <section class="intro w-full">
-  <div class="container">
+  <div class="container" style="background-image: {getBackgroundImage(currentSection)}">
     <!-- Section 1: Welcome and name input -->
     {#if currentSection === 1}
       <img src="logotype.png" alt="Astra Sentinel Logo" class="logo">
@@ -58,37 +74,37 @@
 
     <!-- Section 2: Personal introduction and mission -->
     {#if currentSection === 2}
-      <p class="mb-4 leading-relaxed">Welcome <strong class="text-orange-300">{localName}</strong>! You have been assigned to the AstraSentinel Orbital Operations Center, the leading corporation in planetary defense and space resource exploration.</p>
-      <p class="mb-4 leading-relaxed">For decades, humanity looked to the sky with wonder. Today, we do so with determination. Our mission is clear: protect Earth from cosmic threats and turn what were once risks into opportunities.</p>
+      <p class="mb-4 max-w-4xl">Welcome <strong class="text-orange-300">{localName}</strong>! You have been assigned to the AstraSentinel Orbital Operations Center, the leading corporation in planetary defense and space resource exploration.</p>
+      <p class="mb-4 max-w-4xl">For decades, humanity looked to the sky with wonder. Today, we do so with determination. Our mission is clear: protect Earth from cosmic threats and turn what were once risks into opportunities.</p>
     {/if}
 
     <!-- Section 3: Space context -->
     {#if currentSection === 3}
-      <p class="mb-4 leading-relaxed">Space is no longer a distant territory. It is the new global security front.</p>
-      <p class="mb-4 leading-relaxed">Every year, thousands of objects cross the vicinity of our planet. Most are harmless... others could wipe out humanity in a matter of days.</p>
-      <p class="mb-4 leading-relaxed">AstraSentinel was born to anticipate these events and respond with surgical precision, combining science, strategy, and cutting-edge orbital technology.</p>
+      <p class="mb-4 max-w-4xl">Space is no longer a distant territory. It is the new global security front.</p>
+      <p class="mb-4 max-w-4xl">Every year, thousands of objects cross the vicinity of our planet. Most are harmless... others could wipe out humanity in a matter of days.</p>
+      <p class="mb-4 max-w-4xl">AstraSentinel was born to anticipate these events and respond with surgical precision, combining science, strategy, and cutting-edge orbital technology.</p>
     {/if}
 
     <!-- Section 4: User role -->
     {#if currentSection === 4}
-      <p class="mb-4 leading-relaxed">You have been selected to begin your trial period, due to your analytical capacity and strategic vision.</p>
-      <p class="mb-4 leading-relaxed">Starting today, you will be part of the Space Risk Monitoring, Mitigation and Economic Development Division.</p>
-      <p class="mb-4 leading-relaxed">Your job: identify objects near Earth, evaluate their trajectory, and determine if they represent a threat... or a mining opportunity.</p>
+      <p class="mb-4 max-w-4xl">You have been selected to begin your trial period, due to your analytical capacity and strategic vision.</p>
+      <p class="mb-4 max-w-4xl">Starting today, you will be part of the Space Risk Monitoring, Mitigation and Economic Development Division.</p>
+      <p class="mb-4 max-w-4xl">Your job: identify objects near Earth, evaluate their trajectory, and determine if they represent a threat... or a mining opportunity.</p>
     {/if}
 
     <!-- Section 5: Available tools -->
     {#if currentSection === 5}
-      <p class="mb-4 leading-relaxed">To accomplish this task, you will have limited access to our orbital defense network:</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Sentinel Constellation:</strong> more than 160 surveillance satellites armed with deflection lasers strategically orbiting the planet.</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Ground Stations:</strong> high-power projectors capable of modifying trajectories from the surface.</p>
-      <p class="mb-4 leading-relaxed"><strong class="text-orange-300">Strategic Intelligence Center:</strong> a multidisciplinary team including analysts, diplomats, engineers, strategists, and planetary scientists.</p>
+      <p class="mb-4 max-w-4xl">To accomplish this task, you will have limited access to our orbital defense network:</p>
+      <p class="mb-4 max-w-4xl"><strong class="text-orange-300">Sentinel Constellation:</strong> more than 160 surveillance satellites armed with deflection lasers strategically orbiting the planet.</p>
+      <p class="mb-4 max-w-4xl"><strong class="text-orange-300">Ground Stations:</strong> high-power projectors capable of modifying trajectories from the surface.</p>
+      <p class="mb-4 max-w-4xl"><strong class="text-orange-300">Strategic Intelligence Center:</strong> a multidisciplinary team including analysts, diplomats, engineers, strategists, and planetary scientists.</p>
     {/if}
 
     <!-- Section 6: Mission preparation -->
     {#if currentSection === 6}
-      <p class="mb-4 leading-relaxed">In a few moments you will enter the orbital monitoring room.</p>
-      <p class="mb-4 leading-relaxed">There you will have access to the dynamic map of the nearby solar system, where each detected object is a possible threat... or a valuable source of minerals.</p>
-      <p class="mb-4 leading-relaxed">Choose your target wisely. Your decision will mark the course of our operation and the fate of our planet.</p>
+      <p class="mb-4 max-w-4xl">In a few moments you will enter the orbital monitoring room.</p>
+      <p class="mb-4 max-w-4xl">There you will have access to the dynamic map of the nearby solar system, where each detected object is a possible threat... or a valuable source of minerals.</p>
+      <p class="mb-4 max-w-4xl">Choose your target wisely. Your decision will mark the course of our operation and the fate of our planet.</p>
     {/if}
 
     <!-- Section 7: Final call to action -->
@@ -166,9 +182,41 @@
     max-height: 50vh;
   }
 
+
+
   .container {
     padding: 3rem;
     margin: 0 auto;
+    min-height: calc(100vh - 120px);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: background-image 0.5s ease-in-out;
+  }
+
+  /* Overlay for better text readability on background images */
+  .container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Ensure content is above overlay */
+  .container > * {
+    position: relative;
+    z-index: 2;
   }
 
   footer {
@@ -218,6 +266,9 @@
 
     .container {
       padding: 1rem;
+      /* Mobile: show only left half of background image */
+      background-size: 200% 100% !important;
+      background-position: left center !important;
     }
 
     .logo {
