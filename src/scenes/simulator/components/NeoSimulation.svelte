@@ -1,41 +1,58 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
-  
-  // Removed selectedAsteroid dependency - using hardcoded data now
-  
-  // Hardcoded asteroid data for simulation
-  const hardcodedAsteroid = {
-    name: "2024 QJ7 (Demo Asteroid)",
-    simulationData: {
-      orbitalRadius: 1.847,
-      asteroidSize: 0.127,
-      orbitalPeriod: 2.51,
-      isHazardous: true,
-      dataReliability: 0.89
-    }
-  };
-  
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
   let canvas;
-  let scene, camera, renderer, earth, asteroid;
+  let scene, camera, renderer, controls;
   let animationId;
-  let isSimulating = false;
   
-  // Parámetros de simulación (datos de ejemplo por ahora)
-  let orbitalParams = {
-    earthRadius: 1,
-    asteroidDistance: 3,
-    asteroidSpeed: 0.01,
-    earthRotationSpeed: 0.005,
-    asteroidSize: 0.05
+  // ===== Constantes =====
+  const AU = 1.495978707e11;   // m
+  const DEG = Math.PI/180;
+  const scaleAU = 1;
+
+  // ===== Hypnos (época JD 2460200.5) =====
+  const EL_HYPNOS = { a_AU:2.844, e:0.6653, i:1.98*DEG, Omega:57.94*DEG, omega:238.17*DEG };
+  
+  // ===== Apophis (época JD 2460200.5) =====
+  const EL_APOPHIS = {
+    a_AU: 0.9227,
+    e: 0.1914,
+    i: 3.34 * DEG,
+    Omega: 203.96 * DEG,
+    omega: 126.6 * DEG
   };
+
+  // ===== 6489 Golevka (época JD 2460200.5) =====
+  const EL_GOLEVKA = {
+    a_AU: 2.486,
+    e: 0.6125,
+    i: 2.27 * DEG,
+    Omega: 209.47 * DEG,
+    omega: 68.69 * DEG
+  };
+
+  // ===== Planetas (elementos medios ~J2000, para visualización) =====
+  const PLANETS = [
+    { name:'Mercurio', color:0xc7c7c7, a_AU:0.387098, e:0.205630, i:7.00487*DEG, Omega:48.331*DEG,  omega:29.124*DEG },
+    { name:'Venus',    color:0xe6c27a, a_AU:0.723332, e:0.006772, i:3.39471*DEG, Omega:76.680*DEG,  omega:54.884*DEG },
+    { name:'Tierra',   color:0x6db3ff, a_AU:1.000000, e:0.016710, i:0.00005*DEG, Omega:348.739*DEG, omega:102.947*DEG },
+    { name:'Marte',    color:0xff6b57, a_AU:1.523679, e:0.093400, i:1.85000*DEG, Omega:49.558*DEG,  omega:286.502*DEG },
+  ];
+
+  const asteroids = [
+    { name: 'Hypnos', el: EL_HYPNOS, color: 0xffffff, size: 0.025 },
+    { name: 'Apophis', el: EL_APOPHIS, color: 0xff0000, size: 0.025 },
+    { name: 'Golevka', el: EL_GOLEVKA, color: 0x1eff00, size: 0.025 }
+  ];
+
+  let planetMeshes = [];
+  let asteroidMeshes = [];
+  let time = 0;
   
   onMount(() => {
-    initThreeJS();
-    createEarth();
-    createAsteroid();
-    createLighting();
-    startAnimation();
+    initSimulation();
   });
   
   onDestroy(() => {
@@ -45,456 +62,233 @@
     if (renderer) {
       renderer.dispose();
     }
+    if (controls) {
+      controls.dispose();
+    }
+    window.removeEventListener('resize', handleResize);
   });
-  
-  function initThreeJS() {
-    // Crear escena
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a0a);
-    
-    // Configurar cámara
-    camera = new THREE.PerspectiveCamera(
-      75, 
-      canvas.clientWidth / canvas.clientHeight, 
-      0.1, 
-      1000
-    );
-    camera.position.set(5, 3, 5);
-    camera.lookAt(0, 0, 0);
-    
-    // Configurar renderer
-    renderer = new THREE.WebGLRenderer({ 
-      canvas: canvas, 
-      antialias: true,
-      alpha: true 
-    });
+
+  // ===== Kepler =====
+  function solveE(M, e, tol=1e-12, maxIt=50) {
+    let E = (e < 0.8) ? M : Math.PI;
+    for(let k = 0; k < maxIt; k++) {
+      const f = E - e * Math.sin(E) - M;
+      const fp = 1 - e * Math.cos(E);
+      const dE = -f / fp;
+      E += dE;
+      if (Math.abs(dE) < tol) break;
+    }
+    return E;
+  }
+
+  function buildOrbitGeometry(el, N=720) {
+    const a = el.a_AU * AU, e = el.e;
+    const pts = [];
+    for(let k = 0; k < N; k++) {
+      const M  = 2 * Math.PI * k / N;
+      const E  = solveE(M, e);
+      const r  = a * (1 - e * Math.cos(E));
+      const nu = Math.atan2(Math.sqrt(1 - e * e) * Math.sin(E), Math.cos(E) - e);
+
+      const x_p = r * Math.cos(nu), y_p = r * Math.sin(nu);
+
+      const O = el.Omega, I = el.i || 0, w = el.omega;
+      const cO = Math.cos(O), sO = Math.sin(O);
+      const cI = Math.cos(I), sI = Math.sin(I);
+      const cw = Math.cos(w), sw = Math.sin(w);
+
+      const x = (cO * cw - sO * sw * cI) * x_p + (-cO * sw - sO * cw * cI) * y_p;
+      const y = (sO * cw + cO * sw * cI) * x_p + (-sO * sw + cO * cw * cI) * y_p;
+      const z = (sw * sI) * x_p + (cw * sI) * y_p;
+
+      pts.push(new THREE.Vector3(x / AU / scaleAU, y / AU / scaleAU, z / AU / scaleAU));
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  }
+
+  function calcPosition(el, M) {
+    const a = el.a_AU * AU, e = el.e;
+    const E  = solveE(M, e);
+    const r  = a * (1 - e * Math.cos(E));
+    const nu = Math.atan2(Math.sqrt(1 - e * e) * Math.sin(E), Math.cos(E) - e);
+
+    const x_p = r * Math.cos(nu), y_p = r * Math.sin(nu);
+
+    const O = el.Omega, I = el.i || 0, w = el.omega;
+    const cO = Math.cos(O), sO = Math.sin(O);
+    const cI = Math.cos(I), sI = Math.sin(I);
+    const cw = Math.cos(w), sw = Math.sin(w);
+
+    const x = (cO * cw - sO * sw * cI) * x_p + (-cO * sw - sO * cw * cI) * y_p;
+    const y = (sO * cw + cO * sw * cI) * x_p + (-sO * sw + cO * cw * cI) * y_p;
+    const z = (sw * sI) * x_p + (cw * sI) * y_p;
+
+    return new THREE.Vector3(x / AU / scaleAU, y / AU / scaleAU, z / AU / scaleAU);
+  }
+
+  function initSimulation() {
+    // ===== Escena =====
+    renderer = new THREE.WebGLRenderer({canvas, antialias:true});
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    
-    // Controles básicos de cámara con mouse
-    canvas.addEventListener('mousedown', onMouseDown);
-    canvas.addEventListener('wheel', onWheel);
-  }
-  
-  function createEarth() {
-    // Geometría y material de la Tierra
-    const earthGeometry = new THREE.SphereGeometry(orbitalParams.earthRadius, 32, 32);
-    const earthMaterial = new THREE.MeshPhongMaterial({
-      color: 0x4a90e2,
-      shininess: 100,
-      transparent: true,
-      opacity: 0.9
-    });
-    
-    earth = new THREE.Mesh(earthGeometry, earthMaterial);
-    earth.castShadow = true;
-    earth.receiveShadow = true;
-    
-    // Agregar líneas de latitud/longitud
-    const earthWireframe = new THREE.WireframeGeometry(earthGeometry);
-    const earthLines = new THREE.LineSegments(
-      earthWireframe, 
-      new THREE.LineBasicMaterial({ color: 0x87ceeb, opacity: 0.3, transparent: true })
-    );
-    
-    scene.add(earth);
-    scene.add(earthLines);
-  }
-  
-  function createAsteroid() {
-    // Geometría irregular para el asteroide
-    const asteroidGeometry = new THREE.DodecahedronGeometry(orbitalParams.asteroidSize, 1);
-    
-    // Hacer la forma más irregular
-    const positions = asteroidGeometry.attributes.position;
-    for (let i = 0; i < positions.count; i++) {
-      const vertex = new THREE.Vector3();
-      vertex.fromBufferAttribute(positions, i);
-      vertex.multiplyScalar(0.8 + Math.random() * 0.4); // Variación aleatoria
-      positions.setXYZ(i, vertex.x, vertex.y, vertex.z);
-    }
-    positions.needsUpdate = true;
-    
-    const asteroidMaterial = new THREE.MeshPhongMaterial({
-      color: 0x8b4513,
-      shininess: 30,
-      transparent: true,
-      opacity: 0.9
-    });
-    
-    asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
-    asteroid.castShadow = true;
-    asteroid.position.set(orbitalParams.asteroidDistance, 0, 0);
-    
-    // Crear órbita visual
-    createOrbitPath();
-    
-    scene.add(asteroid);
-    
-    // Initialize with hardcoded data
-    initializeHardcodedData();
-  }
-  
-  function createOrbitPath() {
-    const orbitGeometry = new THREE.RingGeometry(
-      orbitalParams.asteroidDistance - 0.02, 
-      orbitalParams.asteroidDistance + 0.02, 
-      64
-    );
-    const orbitMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff6b35,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.3
-    });
-    const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
-    orbitRing.rotation.x = Math.PI / 2;
-    scene.add(orbitRing);
-  }
-  
-  function createLighting() {
-    // Luz principal (Sol)
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1);
-    sunLight.position.set(10, 10, 5);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b1220);
+
+    camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.0001, 1e9);
+    camera.position.set(0, 2.5, 6);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+    const sunLight = new THREE.PointLight(0xffffff, 2);
     scene.add(sunLight);
-    
-    // Luz ambiental suave
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
-    scene.add(ambientLight);
-    
-    // Agregar estrellas de fondo
-    createStars();
-  }
-  
-  function createStars() {
-    const starsGeometry = new THREE.BufferGeometry();
-    const starsMaterial = new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.02
-    });
-    
-    const starsVertices = [];
-    for (let i = 0; i < 1000; i++) {
-      const x = (Math.random() - 0.5) * 200;
-      const y = (Math.random() - 0.5) * 200;
-      const z = (Math.random() - 0.5) * 200;
-      starsVertices.push(x, y, z);
+
+    // Sol
+    const sun = new THREE.Mesh(
+      new THREE.SphereGeometry(0.06, 24, 16),
+      new THREE.MeshBasicMaterial({color: 0xffcc66})
+    );
+    scene.add(sun);
+
+    // Órbitas de asteroides
+    // Hypnos
+    {
+      const g = buildOrbitGeometry(EL_HYPNOS, 960);
+      const m = new THREE.LineBasicMaterial({ color: 0xffffff, transparent:true, opacity:0.95 });
+      scene.add(new THREE.LineLoop(g, m));
     }
-    
-    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
-    const stars = new THREE.Points(starsGeometry, starsMaterial);
-    scene.add(stars);
-  }
-  
-  function startAnimation() {
-    isSimulating = true;
+    // Órbita de Apophis
+    {
+      const g = buildOrbitGeometry(EL_APOPHIS, 960);
+      const m = new THREE.LineBasicMaterial({ color: 0xff0000, transparent:true, opacity:0.95 });
+      scene.add(new THREE.LineLoop(g, m));
+    }
+    // Órbita de Golevka
+    {
+      const g = buildOrbitGeometry(EL_GOLEVKA, 960);
+      const m = new THREE.LineBasicMaterial({ color: 0x1eff00, transparent:true, opacity:0.95 });
+      scene.add(new THREE.LineLoop(g, m));
+    }
+    // Planetas
+    for(const p of PLANETS) {
+      const g = buildOrbitGeometry(p, 720);
+      const m = new THREE.LineBasicMaterial({ color: p.color, transparent:true, opacity:0.9 });
+      scene.add(new THREE.LineLoop(g, m));
+    }
+
+    // ===== Crear esferas para los planetas =====
+    planetMeshes = [];
+    for (const p of PLANETS) {
+      const geometry = new THREE.SphereGeometry(0.03, 16, 16);
+      const material = new THREE.MeshStandardMaterial({ color: p.color });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+      planetMeshes.push({ mesh, el: p, M0: Math.random() * 2 * Math.PI });
+    }
+
+    // ===== Crear esferas para los asteroides =====
+    asteroidMeshes = [];
+    for (const a of asteroids) {
+      const geometry = new THREE.SphereGeometry(a.size, 12, 12);
+      const material = new THREE.MeshStandardMaterial({ color: a.color });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+      asteroidMeshes.push({ mesh, el: a.el, M0: Math.random() * 2 * Math.PI });
+    }
+
+    // Manejar resize
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    // Iniciar animación
     animate();
   }
-  
+
+  function handleResize() {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
   function animate() {
-    if (!isSimulating) return;
-    
     animationId = requestAnimationFrame(animate);
     
-    // Rotar la Tierra
-    if (earth) {
-      earth.rotation.y += orbitalParams.earthRotationSpeed;
+    time += 0.002; // velocidad orbital visual
+
+    // Actualizar posiciones de los planetas
+    for (const obj of planetMeshes) {
+      const M = obj.M0 + time / Math.pow(obj.el.a_AU, 1.5);
+      const pos = calcPosition(obj.el, M % (2 * Math.PI));
+      obj.mesh.position.copy(pos);
     }
-    
-    // Animar el asteroide en órbita
-    if (asteroid) {
-      const time = Date.now() * orbitalParams.asteroidSpeed;
-      asteroid.position.x = Math.cos(time) * orbitalParams.asteroidDistance;
-      asteroid.position.z = Math.sin(time) * orbitalParams.asteroidDistance;
-      
-      // Rotación del asteroide
-      asteroid.rotation.x += 0.02;
-      asteroid.rotation.y += 0.01;
+
+    // Actualizar posiciones de los asteroides
+    for (const obj of asteroidMeshes) {
+      const M = obj.M0 + time / Math.pow(obj.el.a_AU, 1.5);
+      const pos = calcPosition(obj.el, M % (2 * Math.PI));
+      obj.mesh.position.copy(pos);
     }
-    
+
+    controls.update();
     renderer.render(scene, camera);
-  }
-  
-  function toggleSimulation() {
-    isSimulating = !isSimulating;
-    if (isSimulating) {
-      animate();
-    }
-  }
-  
-  function resetSimulation() {
-    if (asteroid) {
-      asteroid.position.set(orbitalParams.asteroidDistance, 0, 0);
-      asteroid.rotation.set(0, 0, 0);
-    }
-    if (earth) {
-      earth.rotation.set(0, 0, 0);
-    }
-  }
-  
-  // Controles básicos de cámara
-  let mouseDown = false;
-  let mouseX = 0;
-  let mouseY = 0;
-  
-  function onMouseDown(event) {
-    mouseDown = true;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }
-  
-  function onMouseMove(event) {
-    if (!mouseDown) return;
-    
-    const deltaX = event.clientX - mouseX;
-    const deltaY = event.clientY - mouseY;
-    
-    // Rotar cámara alrededor del centro
-    const spherical = new THREE.Spherical();
-    spherical.setFromVector3(camera.position);
-    spherical.theta -= deltaX * 0.01;
-    spherical.phi += deltaY * 0.01;
-    spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
-    
-    camera.position.setFromSpherical(spherical);
-    camera.lookAt(0, 0, 0);
-    
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-  }
-  
-  function onMouseUp() {
-    mouseDown = false;
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
-  }
-  
-  function onWheel(event) {
-    const scale = event.deltaY > 0 ? 1.1 : 0.9;
-    camera.position.multiplyScalar(scale);
-    camera.position.clampLength(2, 20);
-  }
-  
-  // Initialize with hardcoded data when asteroid is created
-  function initializeHardcodedData() {
-    if (asteroid) {
-      updateAsteroidData(hardcodedAsteroid);
-    }
-  }
-  
-  function updateAsteroidData(asteroidData) {
-    
-    // Usar los datos procesados de simulationData
-    const simData = asteroidData.simulationData;
-    if (!simData) {
-      console.warn('No hay datos de simulación para el asteroide:', asteroidData.name);
-      return;
-    }
-    
-    // Usar los valores ya calculados del procesador
-    const sizeScale = simData.asteroidSize || 0.05;
-    const distanceAU = simData.orbitalRadius || 2.5;
-    const velocityScale = simData.orbitalSpeed || 0.01;
-    
-    if (asteroid) {
-      // Actualizar tamaño del asteroide
-      asteroid.scale.setScalar(sizeScale / orbitalParams.asteroidSize);
-      
-      // Actualizar distancia orbital
-      orbitalParams.asteroidDistance = distanceAU;
-      
-      // Actualizar velocidad orbital
-      orbitalParams.asteroidSpeed = velocityScale;
-      
-      // Cambiar color basado en peligrosidad usando simulationData
-      if (simData.isHazardous) {
-        asteroid.material.color.setHex(0xff4444); // Rojo para peligrosos
-      } else {
-        // Usar el colorHue calculado por el procesador
-        const hue = simData.colorHue || 0.1;
-        const brightness = simData.brightness || 0.8;
-        const color = new THREE.Color();
-        color.setHSL(hue, 0.8, brightness * 0.5);
-        asteroid.material.color.copy(color);
-      }
-      
-      // Recrear la órbita con nueva distancia
-      scene.children.forEach(child => {
-        if (child.geometry && child.geometry.type === 'RingGeometry') {
-          scene.remove(child);
-          child.geometry.dispose();
-          child.material.dispose();
-        }
-      });
-      createOrbitPath();
-      
-      // Reiniciar posición del asteroide
-      asteroid.position.set(orbitalParams.asteroidDistance, 0, 0);
-    }
-  }
-  
-  // Función para calcular datos orbitales reales (para futuras mejoras)
-  function calculateRealOrbitalData(asteroidData) {
-    // Aquí podremos agregar cálculos más precisos usando:
-    // - Elementos orbitales reales
-    // - Leyes de Kepler
-    // - Datos de la API de NASA JPL
-    return {
-      semiMajorAxis: asteroidData.miss_distance_km / 149597870.7, // Convertir a AU
-      eccentricity: 0.1, // Placeholder
-      inclination: Math.random() * 30, // Placeholder
-      meanMotion: 0.01 // Placeholder
-    };
   }
 </script>
 
 <div class="simulation-container">
   <div class="simulation-header">
     <h4>🌌 Simulación Orbital 3D</h4>
-    <p class="asteroid-name">{hardcodedAsteroid.name}</p>
+    <p class="asteroid-name">Sistema Solar - Asteroides NEO</p>
   </div>
   
   <div class="canvas-container">
     <canvas bind:this={canvas}></canvas>
-  </div>
-  
-  <div class="simulation-controls">
-    <button class="control-btn" on:click={toggleSimulation}>
-      {isSimulating ? '⏸️ Pausar' : '▶️ Iniciar'}
-    </button>
-    <button class="control-btn" on:click={resetSimulation}>
-      🔄 Reiniciar
-    </button>
-  </div>
-  
-    <div class="asteroid-data">
-    <h5>📊 Datos del Asteroide</h5>
-    <div class="data-item">
-      <span>Radio orbital:</span>
-      <span>{hardcodedAsteroid.simulationData.orbitalRadius.toFixed(3)} AU</span>
-    </div>
-    <div class="data-item">
-      <span>Tamaño del asteroide:</span>
-      <span>{(hardcodedAsteroid.simulationData.asteroidSize * 100).toFixed(1)} u.a.</span>
-    </div>
-    <div class="data-item">
-      <span>Período orbital:</span>
-      <span>{hardcodedAsteroid.simulationData.orbitalPeriod ? hardcodedAsteroid.simulationData.orbitalPeriod.toFixed(1) + ' años' : 'Desconocido'}</span>
-    </div>
-    <div class="data-item">
-      <span>Estado de peligro:</span>
-      <span style="color: {hardcodedAsteroid.simulationData.isHazardous ? '#ff4444' : '#4caf50'}">
-        {hardcodedAsteroid.simulationData.isHazardous ? 'Peligroso' : 'Seguro'}
-      </span>
-    </div>
-    <div class="data-item">
-      <span>Calidad de datos:</span>
-      <span style="color: {hardcodedAsteroid.simulationData.dataReliability > 0.7 ? '#4caf50' : hardcodedAsteroid.simulationData.dataReliability > 0.5 ? '#ffeb3b' : '#ff4444'}">
-        {Math.round(hardcodedAsteroid.simulationData.dataReliability * 100)}%
-      </span>
-    </div>
   </div>
 </div>
 
 <style>
   .simulation-container {
     width: 100%;
-    height: 500px;
-    background: rgba(0, 0, 0, 0.8);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
     border-radius: 10px;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    position: relative;
   }
   
   .simulation-header {
-    text-align: center;
-    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
   }
   
   .simulation-header h4 {
-    color: #4caf50;
     margin: 0 0 0.5rem 0;
+    color: #ff6b35;
     font-size: 1.2rem;
+    font-weight: 600;
   }
   
   .asteroid-name {
-    color: #fff;
-    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
     margin: 0;
   }
   
   .canvas-container {
-    width: 100%;
-    height: 350px;
-    border-radius: 8px;
+    flex: 1;
+    position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   canvas {
     width: 100%;
     height: 100%;
     display: block;
-    cursor: grab;
-  }
-  
-  canvas:active {
-    cursor: grabbing;
-  }
-  
-  .simulation-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1rem 0;
-  }
-  
-  .control-btn {
-    background: rgba(76, 175, 80, 0.8);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-  }
-  
-  .control-btn:hover {
-    background: rgba(76, 175, 80, 1);
-    transform: translateY(-2px);
-  }
-  
-  .simulation-data {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 5px;
-    padding: 0.8rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    font-size: 0.85rem;
-  }
-  
-  .data-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  
-  .data-item span:first-child {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  .data-item span:last-child {
-    color: #4caf50;
-    font-weight: 600;
   }
 </style>
