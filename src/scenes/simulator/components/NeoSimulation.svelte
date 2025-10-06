@@ -2,7 +2,19 @@
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   
-  export let selectedAsteroid = null;
+  // Removed selectedAsteroid dependency - using hardcoded data now
+  
+  // Hardcoded asteroid data for simulation
+  const hardcodedAsteroid = {
+    name: "2024 QJ7 (Demo Asteroid)",
+    simulationData: {
+      orbitalRadius: 1.847,
+      asteroidSize: 0.127,
+      orbitalPeriod: 2.51,
+      isHazardous: true,
+      dataReliability: 0.89
+    }
+  };
   
   let canvas;
   let scene, camera, renderer, earth, asteroid;
@@ -119,6 +131,9 @@
     createOrbitPath();
     
     scene.add(asteroid);
+    
+    // Initialize with hardcoded data
+    initializeHardcodedData();
   }
   
   function createOrbitPath() {
@@ -267,9 +282,11 @@
     camera.position.clampLength(2, 20);
   }
   
-  // Reactivo: actualizar simulación cuando cambie el asteroide seleccionado
-  $: if (selectedAsteroid && asteroid) {
-    updateAsteroidData(selectedAsteroid);
+  // Initialize with hardcoded data when asteroid is created
+  function initializeHardcodedData() {
+    if (asteroid) {
+      updateAsteroidData(hardcodedAsteroid);
+    }
   }
   
   function updateAsteroidData(asteroidData) {
@@ -341,11 +358,7 @@
 <div class="simulation-container">
   <div class="simulation-header">
     <h4>🌌 Simulación Orbital 3D</h4>
-    {#if selectedAsteroid}
-      <p class="asteroid-name">{selectedAsteroid.name}</p>
-    {:else}
-      <p class="no-asteroid">Selecciona un asteroide para simular</p>
-    {/if}
+    <p class="asteroid-name">{hardcodedAsteroid.name}</p>
   </div>
   
   <div class="canvas-container">
@@ -361,34 +374,33 @@
     </button>
   </div>
   
-  {#if selectedAsteroid && selectedAsteroid.simulationData}
-    <div class="simulation-data">
-      <div class="data-item">
-        <span>Radio orbital:</span>
-        <span>{selectedAsteroid.simulationData.orbitalRadius.toFixed(3)} AU</span>
-      </div>
-      <div class="data-item">
-        <span>Tamaño del asteroide:</span>
-        <span>{(selectedAsteroid.simulationData.asteroidSize * 100).toFixed(1)} u.a.</span>
-      </div>
-      <div class="data-item">
-        <span>Período orbital:</span>
-        <span>{selectedAsteroid.simulationData.orbitalPeriod ? selectedAsteroid.simulationData.orbitalPeriod.toFixed(1) + ' años' : 'Desconocido'}</span>
-      </div>
-      <div class="data-item">
-        <span>Estado de peligro:</span>
-        <span style="color: {selectedAsteroid.simulationData.isHazardous ? '#ff4444' : '#4caf50'}">
-          {selectedAsteroid.simulationData.isHazardous ? 'Peligroso' : 'Seguro'}
-        </span>
-      </div>
-      <div class="data-item">
-        <span>Calidad de datos:</span>
-        <span style="color: {selectedAsteroid.simulationData.dataReliability > 0.7 ? '#4caf50' : selectedAsteroid.simulationData.dataReliability > 0.5 ? '#ffeb3b' : '#ff4444'}">
-          {Math.round(selectedAsteroid.simulationData.dataReliability * 100)}%
-        </span>
-      </div>
+    <div class="asteroid-data">
+    <h5>📊 Datos del Asteroide</h5>
+    <div class="data-item">
+      <span>Radio orbital:</span>
+      <span>{hardcodedAsteroid.simulationData.orbitalRadius.toFixed(3)} AU</span>
     </div>
-  {/if}
+    <div class="data-item">
+      <span>Tamaño del asteroide:</span>
+      <span>{(hardcodedAsteroid.simulationData.asteroidSize * 100).toFixed(1)} u.a.</span>
+    </div>
+    <div class="data-item">
+      <span>Período orbital:</span>
+      <span>{hardcodedAsteroid.simulationData.orbitalPeriod ? hardcodedAsteroid.simulationData.orbitalPeriod.toFixed(1) + ' años' : 'Desconocido'}</span>
+    </div>
+    <div class="data-item">
+      <span>Estado de peligro:</span>
+      <span style="color: {hardcodedAsteroid.simulationData.isHazardous ? '#ff4444' : '#4caf50'}">
+        {hardcodedAsteroid.simulationData.isHazardous ? 'Peligroso' : 'Seguro'}
+      </span>
+    </div>
+    <div class="data-item">
+      <span>Calidad de datos:</span>
+      <span style="color: {hardcodedAsteroid.simulationData.dataReliability > 0.7 ? '#4caf50' : hardcodedAsteroid.simulationData.dataReliability > 0.5 ? '#ffeb3b' : '#ff4444'}">
+        {Math.round(hardcodedAsteroid.simulationData.dataReliability * 100)}%
+      </span>
+    </div>
+  </div>
 </div>
 
 <style>
@@ -415,12 +427,6 @@
   .asteroid-name {
     color: #fff;
     font-weight: 600;
-    margin: 0;
-  }
-  
-  .no-asteroid {
-    color: rgba(255, 255, 255, 0.6);
-    font-style: italic;
     margin: 0;
   }
   

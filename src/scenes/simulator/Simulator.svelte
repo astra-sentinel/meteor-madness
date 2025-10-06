@@ -77,7 +77,7 @@
 <section class="simulator">
   <!-- Simulación 3D principal -->
   <div class="neo-simulation">
-    <NeoSimulation {selectedAsteroid} />
+    <NeoSimulation />
   </div>
   
   <!-- Lista de asteroides detectados -->
