@@ -36,6 +36,7 @@ function processAsteroidData(rawData, index = 0) {
 
   // Extraer y limpiar el nombre
   const name = extractCleanName(rawData.full_name);
+  const fullName = rawData.full_name || 'Asteroide Desconocido';
   
   // Extraer elementos orbitales
   const orbitalElements = {
@@ -64,6 +65,7 @@ function processAsteroidData(rawData, index = 0) {
     // Identificación básica
     id: generateAsteroidId(rawData, index),
     name: name,
+    fullName: fullName,
     
     // Propiedades calculadas
     orbitalVelocity: orbitalVelocity,      // km/s - Velocidad orbital

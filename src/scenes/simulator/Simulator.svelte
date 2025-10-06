@@ -31,7 +31,7 @@
       console.log('CSV Data Sample:', csvAsteroids.slice(0, 3));
       
       // Procesar los datos usando el procesador de asteroides
-      const processedData = processAsteroids(csvAsteroids.slice(0, 50));
+      const processedData = processAsteroids(csvAsteroids.slice(0, 200));
       asteroids = processedData;
       
       console.log(`✅ Procesados ${asteroids.length} asteroides`);
@@ -127,6 +127,9 @@
     background: rgba(255,255,255,0.05);
     border-radius: 10px;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   
   .neo-detail {

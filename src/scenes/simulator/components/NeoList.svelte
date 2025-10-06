@@ -20,11 +20,7 @@
     return '🟢';
   }
   
-  // Función para formatear distancia orbital en AU
-  function formatOrbitalDistance(distanceAU) {
-    if (!distanceAU) return 'Unknown';
-    return `${distanceAU.toFixed(2)} AU`;
-  }
+
   
   function selectAsteroid(asteroid) {
     dispatch('asteroidSelected', asteroid);
@@ -59,8 +55,7 @@
         >
           <span class="danger-indicator">{getDangerEmoji(asteroid)}</span>
           <div class="asteroid-basic-info">
-            <div class="name">{asteroid.name}</div>
-            <div class="distance">{formatOrbitalDistance(asteroid.simulationData?.orbitalRadius)}</div>
+            <div class="name">{asteroid.fullName || asteroid.name}</div>
           </div>
           <div class="select-arrow">▶</div>
         </button>
@@ -72,7 +67,7 @@
   <div class="list-footer">
     {#if csvAsteroids.length > 0}
       <div class="data-info">
-        <small>📊 CSV Data: {csvAsteroids.length} asteroids loaded</small>
+        <small>NEO CSV Data: {csvAsteroids.length} asteroids loaded</small>
       </div>
     {:else if !isLoading && asteroids.length === 0 && onDebugReload}
       <div class="debug-controls">
@@ -86,7 +81,9 @@
 
 <style>
   .neo-list {
-    margin: 2rem 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
   
   h3 {
@@ -118,7 +115,7 @@
   }
   
   .asteroids-list {
-    max-height: 300px;
+    flex: 1;
     overflow-y: auto;
     border: 1px solid rgba(255,255,255,0.2);
     border-radius: 10px;
@@ -143,7 +140,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.8rem 1rem;
+    padding: 0.6rem 1rem;
     background: transparent;
     border: none;
     border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -180,15 +177,9 @@
   .name {
     font-weight: 600;
     font-size: 0.9rem;
-    margin-bottom: 0.2rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  
-  .distance {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.7);
   }
   
   .select-arrow {
@@ -243,6 +234,7 @@
     margin-top: 1rem;
     border-top: 1px solid rgba(255,255,255,0.1);
     padding-top: 1rem;
+    flex-shrink: 0;
   }
   
   .data-info {

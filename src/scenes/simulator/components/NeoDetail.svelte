@@ -17,7 +17,7 @@
   <div class="asteroid-details">
     <h4>📋 Asteroid Details</h4>
     <div class="detail-card">
-      <h5>{selectedAsteroid.name}</h5>
+      <h5>{selectedAsteroid.fullName || selectedAsteroid.name}</h5>
       
       {#if selectedAsteroid.simulationData?.isHazardous}
         <div class="hazard-alert">
