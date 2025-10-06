@@ -25,13 +25,13 @@ export function getPublicFileUrl(fileName) {
  */
 export function parseCSVText(csvText) {
   if (!csvText || typeof csvText !== 'string') {
-    throw new Error('El texto CSV debe ser una cadena válida');
+    throw new Error('CSV text must be a valid string');
   }
 
   const lines = csvText.trim().split('\n');
   
   if (lines.length < 2) {
-    throw new Error('El archivo CSV debe tener al menos una fila de encabezados y una fila de datos');
+    throw new Error('CSV file must have at least one header row and one data row');
   }
 
   // Extraer encabezados (primera fila)
@@ -51,7 +51,7 @@ export function parseCSVText(csvText) {
       
       return rowObject;
     } catch (error) {
-      console.warn(`Error parseando fila ${index + 2}: ${error.message}`);
+      console.warn(`Error parsing row ${index + 2}: ${error.message}`);
       return null;
     }
   }).filter(row => row !== null); // Filtrar filas que no se pudieron parsear
@@ -112,7 +112,7 @@ export function parseCSVLine(line) {
  */
 export async function loadCSVFromUrl(url) {
   try {
-    console.log(`Cargando CSV desde: ${url}`);
+    console.log(`Loading CSV from: ${url}`);
     
     const response = await fetch(url);
     if (!response.ok) {
@@ -123,7 +123,7 @@ export async function loadCSVFromUrl(url) {
     return parseCSVText(csvText);
 
   } catch (error) {
-    console.error(`Error cargando CSV desde ${url}:`, error);
+    console.error(`Error loading CSV from ${url}:`, error);
     throw error;
   }
 }
@@ -153,15 +153,15 @@ export async function loadCSVFromPublic(fileName, alternativeUrls = []) {
     
     for (const url of urlsToTry) {
       try {
-        console.log(`Probando URL alternativa: ${url}`);
+        console.log(`Trying alternative URL: ${url}`);
         return await loadCSVFromUrl(url);
       } catch (error) {
-        console.log(`Falló URL alternativa ${url}:`, error.message);
+        console.log(`Failed alternative URL ${url}:`, error.message);
       }
     }
     
     // Si todas las URLs fallaron, lanzar el error original
-    throw new Error(`No se pudo cargar ${fileName}. Error principal: ${mainError.message}`);
+    throw new Error(`Could not load ${fileName}. Main error: ${mainError.message}`);
   }
 }
 
@@ -198,7 +198,7 @@ export async function loadCSV(fileName, options = {}) {
     
   } catch (error) {
     if (logProgress) {
-      console.error(`❌ Error cargando ${fileName}:`, error.message);
+      console.error(`❌ Error loading ${fileName}:`, error.message);
     }
     throw error;
   }

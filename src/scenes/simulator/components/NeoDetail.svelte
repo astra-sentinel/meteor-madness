@@ -4,51 +4,51 @@
   // Función para obtener etiquetas legibles de calidad
   function getQualityLabel(quality) {
     const labels = {
-      'excellent': 'Excelente',
-      'good': 'Buena',
-      'fair': 'Regular', 
-      'poor': 'Limitada'
+      'excellent': 'Excellent',
+      'good': 'Good',
+      'fair': 'Fair', 
+      'poor': 'Limited'
     };
-    return labels[quality] || 'Desconocida';
+    return labels[quality] || 'Unknown';
   }
 </script>
 
 {#if selectedAsteroid}
   <div class="asteroid-details">
-    <h4>📋 Detalles del Asteroide</h4>
+    <h4>📋 Asteroid Details</h4>
     <div class="detail-card">
       <h5>{selectedAsteroid.name}</h5>
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="label">Velocidad Orbital:</span>
+          <span class="label">Orbital Velocity:</span>
           <span class="value">
             {selectedAsteroid.orbitalVelocity ? 
               `${selectedAsteroid.orbitalVelocity} km/s` : 
-              'Calculando...'}
+              'Calculating...'}
           </span>
         </div>
         <div class="detail-item">
-          <span class="label">Diámetro Aproximado:</span>
+          <span class="label">Approximate Diameter:</span>
           <span class="value">
             {selectedAsteroid.approximateDiameter ? 
               `${selectedAsteroid.approximateDiameter} km` : 
-              'Calculando...'}
+              'Calculating...'}
           </span>
         </div>
         <div class="detail-item">
-          <span class="label">Fecha de Aproximación:</span>
+          <span class="label">Approach Date:</span>
           <span class="value">
-            {selectedAsteroid.approachDate || 'Por determinar'}
+            {selectedAsteroid.approachDate || 'To be determined'}
           </span>
         </div>
         <div class="detail-item">
-          <span class="label">Composición:</span>
+          <span class="label">Composition:</span>
           <span class="value">
-            {selectedAsteroid.composition || 'Analizando...'}
+            {selectedAsteroid.composition || 'Analyzing...'}
           </span>
         </div>
         <div class="detail-item">
-          <span class="label">Calidad de Datos:</span>
+          <span class="label">Data Quality:</span>
           <span class="value quality-{selectedAsteroid.dataQuality}">
             {getQualityLabel(selectedAsteroid.dataQuality)}
           </span>
@@ -58,7 +58,7 @@
   </div>
 {:else}
   <div class="no-selection">
-    <p>Selecciona un asteroide de la lista para ver sus detalles</p>
+    <p>Select an asteroid from the list to view its details</p>
   </div>
 {/if}
 

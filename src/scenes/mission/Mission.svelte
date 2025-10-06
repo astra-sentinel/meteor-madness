@@ -7,29 +7,29 @@
 </script>
 
 <section class="mission">
-  <h2>🎯 Estrategia</h2>
-  <p>Excelente trabajo {$userName ? $userName : 'Comandante'}. ¡Es hora de tomar decisiones críticas!</p>
-  <p>Basándote en la simulación completada, debes elegir la mejor estrategia para salvar la Tierra.</p>
+  <h2>🎯 Strategy</h2>
+  <p>Excellent work {$userName ? $userName : 'Commander'}. It's time to make critical decisions!</p>
+  <p>Based on the completed simulation, you must choose the best strategy to save Earth.</p>
   
   <div class="strategy-options">
     <div class="option">
-      <h3>🚀 Misil Nuclear</h3>
-      <p>Destruir el meteorito con armamento nuclear</p>
+      <h3>🚀 Nuclear Missile</h3>
+      <p>Destroy the meteorite with nuclear weapons</p>
     </div>
     
     <div class="option">
-      <h3>🛸 Desviación Gravitacional</h3>
-      <p>Usar naves espaciales para alterar su trayectoria</p>
+      <h3>🛸 Gravitational Deflection</h3>
+      <p>Use spacecraft to alter its trajectory</p>
     </div>
     
     <div class="option">
-      <h3>⚡ Láser Orbital</h3>
-      <p>Vaporizar el meteorito con tecnología avanzada</p>
+      <h3>⚡ Orbital Laser</h3>
+      <p>Vaporize the meteorite with advanced technology</p>
     </div>
   </div>
   
   <button class="action-btn" on:click={goBackToIntro}>
-    🔄 Volver al Inicio
+    🔄 Return to Start
   </button>
 </section>
 

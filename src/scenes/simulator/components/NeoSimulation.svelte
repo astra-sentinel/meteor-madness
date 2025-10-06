@@ -35,10 +35,10 @@
 
   // ===== Planetas (elementos medios ~J2000, para visualización) =====
   const PLANETS = [
-    { name:'Mercurio', color:0xc7c7c7, a_AU:0.387098, e:0.205630, i:7.00487*DEG, Omega:48.331*DEG,  omega:29.124*DEG },
+    { name:'Mercury', color:0xc7c7c7, a_AU:0.387098, e:0.205630, i:7.00487*DEG, Omega:48.331*DEG,  omega:29.124*DEG },
     { name:'Venus',    color:0xe6c27a, a_AU:0.723332, e:0.006772, i:3.39471*DEG, Omega:76.680*DEG,  omega:54.884*DEG },
-    { name:'Tierra',   color:0x6db3ff, a_AU:1.000000, e:0.016710, i:0.00005*DEG, Omega:348.739*DEG, omega:102.947*DEG },
-    { name:'Marte',    color:0xff6b57, a_AU:1.523679, e:0.093400, i:1.85000*DEG, Omega:49.558*DEG,  omega:286.502*DEG },
+    { name:'Earth',   color:0x6db3ff, a_AU:1.000000, e:0.016710, i:0.00005*DEG, Omega:348.739*DEG, omega:102.947*DEG },
+    { name:'Mars',    color:0xff6b57, a_AU:1.523679, e:0.093400, i:1.85000*DEG, Omega:49.558*DEG,  omega:286.502*DEG },
   ];
 
   const asteroids = [
@@ -239,7 +239,7 @@
 
 <div class="simulation-container">
   <div class="simulation-header">
-    <h4>Sistema Solar - Asteroides NEO</h4>
+    <h4>Solar System - NEO Asteroids</h4>
   </div>
   
   <div class="canvas-container">

@@ -10,14 +10,14 @@
  */
 export function processAsteroids(csvData) {
   if (!Array.isArray(csvData)) {
-    throw new Error('Los datos deben ser un array');
+    throw new Error('Data must be an array');
   }
 
   return csvData.map((rawAsteroid, index) => {
     try {
       return processAsteroidData(rawAsteroid, index);
     } catch (error) {
-      console.warn(`Error procesando asteroide en posición ${index}:`, error.message);
+      console.warn(`Error processing asteroid at position ${index}:`, error.message);
       return null;
     }
   }).filter(asteroid => asteroid !== null);
@@ -31,7 +31,7 @@ export function processAsteroids(csvData) {
  */
 function processAsteroidData(rawData, index = 0) {
   if (!rawData || typeof rawData !== 'object') {
-    throw new Error('Los datos del asteroide deben ser un objeto válido');
+    throw new Error('Asteroid data must be a valid object');
   }
 
   // Extraer y limpiar el nombre

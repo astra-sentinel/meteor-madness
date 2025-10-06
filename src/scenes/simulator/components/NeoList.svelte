@@ -22,7 +22,7 @@
   
   // Función para formatear distancia orbital en AU
   function formatOrbitalDistance(distanceAU) {
-    if (!distanceAU) return 'Desconocida';
+    if (!distanceAU) return 'Unknown';
     return `${distanceAU.toFixed(2)} AU`;
   }
   
@@ -32,23 +32,23 @@
 </script>
 
 <div class="neo-list">
-  <h3>🌌 Asteroides Detectados ({asteroids.length})</h3>
+  <h3>Detected Asteroids ({asteroids.length})</h3>
   
   <!-- Estados de carga -->
   {#if isLoading}
     <div class="loading-indicator">
       <div class="spinner"></div>
-      <p>Cargando datos de asteroides...</p>
+      <p>Loading asteroid data...</p>
     </div>
   {:else if loadError}
     <div class="error-indicator">
       <p>⚠️ Error: {loadError}</p>
-      <p>Reintentar carga</p>
+      <p>Retry loading</p>
     </div>
   {:else if asteroids.length === 0}
     <div class="loading">
       <div class="spinner"></div>
-      <p>Escaneando el espacio...</p>
+      <p>Scanning space...</p>
     </div>
   {:else}
     <div class="asteroids-list">
@@ -72,7 +72,7 @@
   <div class="list-footer">
     {#if csvAsteroids.length > 0}
       <div class="data-info">
-        <small>📊 Datos del CSV: {csvAsteroids.length} asteroides cargados</small>
+        <small>📊 CSV Data: {csvAsteroids.length} asteroids loaded</small>
       </div>
     {:else if !isLoading && asteroids.length === 0 && onDebugReload}
       <div class="debug-controls">

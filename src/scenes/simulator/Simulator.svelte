@@ -75,7 +75,7 @@
 </script>
 
 <section class="simulator">
-  <!-- Simulación 3D principal -->
+  <!-- Main 3D Simulation -->
   <div class="neo-simulation">
     <NeoSimulation />
   </div>
@@ -99,9 +99,9 @@
   </div>
   
   <!-- <button class="action-btn" on:click={goToMission}>
-    🎯 Ir a Estrategia
+    🎯 Go to Strategy
   </button> -->
-  <a class="action-btn" href="https://modelo-colision.onrender.com" target="_blank">Ir a Modelo de Colisión</a>
+  <a class="action-btn" href="https://modelo-colision.onrender.com" target="_blank">Go to Collision Model</a>
 </section>
 
 <style>
