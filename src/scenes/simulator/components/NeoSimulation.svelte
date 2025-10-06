@@ -132,7 +132,7 @@
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1220);
+    scene.background = new THREE.Color(0x000000);
 
     camera = new THREE.PerspectiveCamera(55, canvas.clientWidth / canvas.clientHeight, 0.0001, 1e9);
     camera.position.set(0, 2.5, 6);
@@ -239,8 +239,7 @@
 
 <div class="simulation-container">
   <div class="simulation-header">
-    <h4>🌌 Simulación Orbital 3D</h4>
-    <p class="asteroid-name">Sistema Solar - Asteroides NEO</p>
+    <h4>Sistema Solar - Asteroides NEO</h4>
   </div>
   
   <div class="canvas-container">
@@ -269,15 +268,9 @@
   
   .simulation-header h4 {
     margin: 0 0 0.5rem 0;
-    color: #ff6b35;
     font-size: 1.2rem;
     font-weight: 600;
-  }
-  
-  .asteroid-name {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    margin: 0;
+    text-align: center;
   }
   
   .canvas-container {
